@@ -1,0 +1,8 @@
+pymongo
+zenml
+pandas
+scikit-learn
+joblib
+numpy
+tensorflow
+keras
