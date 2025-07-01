@@ -89,10 +89,10 @@ More examples will be available in the [examples](./examples) folder.
 
 If you use this work, please cite:
 > "Constraint Guided Learning of a Deep Learning based Health Indicator Model"  
-> *Your Name*, et al.
+> *Yonas Tefera*, et al.
 
 ---
 
 ## 📬 Contact
 Questions, suggestions, or contributions?  
-Open an issue or contact: [your.email@example.com](mailto:your.email@example.com)
+Open an issue or contact: [yonas.yehualaeshet@gmail.com](mailto:yonas.yehualaeshet@gmail.com)
