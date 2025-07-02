@@ -3,7 +3,7 @@ import librosa
 import pywt
 
 
-class Signal_Features:
+class signal_features:
     """
         A class used for time series signal feature extraction.
     """
