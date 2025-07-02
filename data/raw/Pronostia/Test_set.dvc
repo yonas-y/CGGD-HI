@@ -1,0 +1,6 @@
+outs:
+- md5: b400ee2955212acb2fe7e6dcb413f220.dir
+  size: 422380883
+  nfiles: 5454
+  hash: md5
+  path: Test_set

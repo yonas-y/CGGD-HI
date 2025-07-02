@@ -1,0 +1,6 @@
+outs:
+- md5: 1f74b58c5b68015065cb777c479723fd.dir
+  size: 601439811
+  nfiles: 8384
+  hash: md5
+  path: Learning_set
