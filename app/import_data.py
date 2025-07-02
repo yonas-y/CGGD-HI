@@ -3,15 +3,16 @@ import pandas as pd
 from pathlib import Path
 
 
-def import_bearing_data_to_pickle(data_directory_path):
+def import_bearing_data_to_pickle(data_directory_path, pickle_directory_path):
     """
     Imports and converts the original bearing accelerometer CSV file from the given directory into pandas dataframe!!
-    Then it stores as a pickle file!
+    Then it stores as a pickle file in a directory!
 
     :param data_directory_path: The path to the file's directory!
+    :param pickle_directory_path: The path to store the converted pickle directory!'
     """
     data_dir = Path(data_directory_path)
-    pickle_dir = data_dir / "pickles"
+    pickle_dir = Path(pickle_directory_path)
     pickle_dir.mkdir(exist_ok=True)  # create the pickles directory if it doesn't exist
 
     columns = ['Hour', 'Minute', 'Second', 'micro-second', 'Horiz. accel.', 'Vert. accel.']
