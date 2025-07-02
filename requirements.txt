@@ -6,3 +6,4 @@ joblib
 numpy
 tensorflow
 keras
+pathlib
