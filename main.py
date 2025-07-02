@@ -1,5 +1,5 @@
-from pipelines.training_pipeline import training_pipeline
+from pipelines.data_pipeline import data_pipeline
 
 if __name__ == "__main__":
-    # Run the pipeline!
-    training_pipeline()
+    # Run the pipelines!
+    data_pipeline()
