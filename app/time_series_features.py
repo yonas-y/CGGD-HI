@@ -21,7 +21,8 @@ class signal_features:
         self.hop_length = hop_length
 
     def signal_max_and_min(self):
-        """Finds the maximum and minimum value of a signal.
+        """
+        Finds the maximum and minimum value of a signal.
 
         Returns:
           A tuple of two floats, representing the maximum and minimum value of the signal.
@@ -34,7 +35,8 @@ class signal_features:
         return signal_max_value, signal_min_value
 
     def signal_peak_values(self):
-        """Calculates the peak values of a signal.
+        """
+        Calculates the peak values of a signal.
 
         Returns:
           A NumPy array containing the peak values of the signal.
@@ -46,7 +48,8 @@ class signal_features:
         return peak_values
 
     def signal_absolute_mean_value(self):
-        """Finds the absolute mean value of a signal.
+        """
+        Finds the absolute mean value of a signal.
 
         Returns:
           A float representing the absolute mean value of the signal.
@@ -61,7 +64,8 @@ class signal_features:
         return signal_abs_mean_value
 
     def signal_rms(self):
-        """Calculates the RMS value of a signal.
+        """
+        Calculates the RMS value of a signal.
 
         Returns:
           A NumPy array containing the RMS value of the signal.
@@ -71,7 +75,8 @@ class signal_features:
         return sig_rms
 
     def signal_standard_deviation(self):
-        """Calculates the standard deviation of a signal.
+        """
+        Calculates the standard deviation of a signal.
 
         Returns:
           A NumPy array containing the standard deviation of the signal.
@@ -81,7 +86,8 @@ class signal_features:
         return sig_standard_deviation
 
     def signal_standard_deviation_in_frequency_domain(self):
-        """Calculates the standard deviation of a signal in the frequency domain.
+        """
+        Calculates the standard deviation of a signal in the frequency domain.
 
         Returns:
           A NumPy array containing the standard deviation of the signal in the frequency domain.
@@ -100,7 +106,8 @@ class signal_features:
         return istft
 
     def signal_variance(self):
-        """Calculates the variance of a signal.
+        """
+        Calculates the variance of a signal.
 
         Returns:
           A NumPy array containing the variance of the signal.
@@ -108,3 +115,42 @@ class signal_features:
 
         variance = np.var(self.input_signal, axis=0)
         return variance
+
+    def signal_skewness(self):
+        """
+        Calculates the skewness of a signal.
+
+        Returns:
+          A NumPy array containing the skewness of the signal.
+        """
+
+        # Calculate the magnitude spectrum of the signal.
+        magnitude_spectrum = librosa.core.stft(self.input_signal,
+                                               n_fft=self.frame_length,
+                                               hop_length=self.hop_length)
+        magnitude_spectrum = np.abs(magnitude_spectrum)
+
+        # Calculate the skewness of the magnitude spectrum.
+        skewness = np.mean(magnitude_spectrum ** 3) / np.std(magnitude_spectrum) ** 3
+
+        return skewness
+
+    def signal_kurtosis(self):
+        """
+        Calculates the kurtosis of a signal.
+
+        Returns:
+          A NumPy array containing the kurtosis of the signal.
+        """
+
+        # Calculate the magnitude spectrum of the signal.
+        magnitude_spectrum = librosa.core.stft(self.input_signal,
+                                               n_fft=self.frame_length,
+                                               hop_length=self.hop_length)
+        magnitude_spectrum = np.abs(magnitude_spectrum)
+
+        # Calculate the kurtosis of the magnitude spectrum.
+        kurtosis = np.mean(magnitude_spectrum ** 4) / np.std(magnitude_spectrum) ** 4 - 3
+
+        return kurtosis
+
