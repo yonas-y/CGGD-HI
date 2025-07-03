@@ -59,3 +59,13 @@ class signal_features:
         signal_abs_mean_value = np.mean(absolute_input_signal)
 
         return signal_abs_mean_value
+
+    def signal_rms(self):
+        """Calculates the RMS value of a signal.
+
+        Returns:
+          A NumPy array containing the RMS value of the audio signal.
+        """
+
+        sig_rms = np.sqrt(np.mean(np.square(self.input_signal)))
+        return sig_rms
