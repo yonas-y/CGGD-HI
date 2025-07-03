@@ -54,8 +54,8 @@ def feature_extraction(PICKLE_DIR, FEATURE_OUT_DIR) -> None:
             """
 
             # Mel spectral matrices of the frame!
-            mel_S_V, mel_S_dB_V = feat_class_V.signal_mel_spectrogram(N_mels=n_mels)
-            mel_S_H, mel_S_dB_H = feat_class_H.signal_mel_spectrogram(N_mels=n_mels)
+            _, mel_S_dB_V = feat_class_V.signal_mel_spectrogram(N_mels=n_mels)
+            _, mel_S_dB_H = feat_class_H.signal_mel_spectrogram(N_mels=n_mels)
 
             # Collect flattened features into lists
             ACM_V_Feat_list.append(mel_S_dB_V.ravel())
@@ -69,6 +69,6 @@ def feature_extraction(PICKLE_DIR, FEATURE_OUT_DIR) -> None:
         ACM_Feat = np.concatenate((ACM_V_Feat, ACM_H_Feat), axis=2)  # shape: (n_samples, n_features, 2)
 
         # Save the features for later use as a numpy file!
-        np.save(FEATURE_OUT_DIR / f"{file.stem[:10]}_feat_mel_{n_mels}.npy", ACM_Feat)
+        np.save(FEATURE_OUT_DIR / f"{file.stem[:10]}_feat_mel_DB_{n_mels}.npy", ACM_Feat)
 
     return
