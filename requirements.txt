@@ -7,3 +7,5 @@ numpy
 tensorflow
 keras
 pathlib
+librosa
+PyWavelets
