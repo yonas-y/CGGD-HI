@@ -178,4 +178,36 @@ class signal_features:
         rms = np.sqrt(np.mean(self.input_signal ** 2))
         return peak / rms
 
+    def signal_clearance_factor(self):
+        """
+        Calculates a simple clearance factor for a signal.
 
+        Returns:
+          float: The clearance factor.
+        """
+
+        # Calculate the average and peak amplitudes of the signal.
+        average = np.mean(self.input_signal)
+        peak = np.max(np.abs(self.input_signal))
+
+        # Calculate the clearance factor.
+        clearance_factor = (peak - average) / average
+
+        return clearance_factor
+
+    def signal_pulse_factor(self):
+        """
+        Calculates a simple pulse factor for a signal.
+
+        Returns:
+          float: The pulse factor.
+        """
+
+        # Calculate the average and peak amplitudes of the signal.
+        average = np.mean(self.input_signal)
+        peak = np.max(np.abs(self.input_signal))
+
+        # Calculate the pulse factor.
+        pulse_factor = (peak - average) / (average + peak)
+
+        return pulse_factor
