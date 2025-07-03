@@ -6,7 +6,7 @@ from app.data_importing import import_bearing_data_to_pickle
 
 logger = logging.getLogger(__name__)
 
-@step
+@step(enable_cache=True)
 def import_and_catch_data_step(raw_data_dir, pickle_dir) -> None:
     """
     Step to load raw CSVs, combine and save as pickle, only if pickle doesn't already exist.

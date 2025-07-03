@@ -6,7 +6,7 @@ from app.feature_extraction import feature_extraction
 
 logger = logging.getLogger(__name__)
 
-@step
+@step(enable_cache=True)
 def feature_extraction_step(pickle_dir, feature_dir) -> None:
     """
     Step to extract features from the input pickle data.
