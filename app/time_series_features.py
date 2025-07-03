@@ -211,3 +211,28 @@ class signal_features:
         pulse_factor = (peak - average) / (average + peak)
 
         return pulse_factor
+
+    def signal_fft(self):
+        """
+        Computes the fast Fourier transform (FFT) of a signal.
+
+        Returns:
+          A NumPy array containing the FFT of the signal.
+        """
+
+        fft_signal = np.fft.fft(self.input_signal)
+        return fft_signal
+
+    def signal_stft(self):
+        """
+        Computes the Short Time Fourier Transform (STFT) of a signal.
+
+        Returns:
+          A NumPy array containing the STFT of the signal.
+        """
+
+        # Compute the STFT.
+        D = librosa.stft(self.input_signal, n_fft=self.frame_length, hop_length=self.hop_length)
+
+        # Return the STFT.
+        return D
