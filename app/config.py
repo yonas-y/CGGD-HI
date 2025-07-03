@@ -21,7 +21,7 @@ FEATURE_DIR = "data/features"
 Important parameters about the Pronostia dataset!!
 """
 SampleRate = 25600                          # sampling rate of the incoming signal
-OneS_Samples = 2560                         # samples representative of 1 sec duration.
+OneSec_Samples = 2560                         # samples representative of 1 sec duration.
 frame_length = 2560                         # number of FFT components
 hop_length = 2561                           # hop length for spectrogram frames
 n_mels = 256                                # number of Mel bands to generate
