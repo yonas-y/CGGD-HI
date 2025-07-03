@@ -64,8 +64,47 @@ class signal_features:
         """Calculates the RMS value of a signal.
 
         Returns:
-          A NumPy array containing the RMS value of the audio signal.
+          A NumPy array containing the RMS value of the signal.
         """
 
         sig_rms = np.sqrt(np.mean(np.square(self.input_signal)))
         return sig_rms
+
+    def signal_standard_deviation(self):
+        """Calculates the standard deviation of a signal.
+
+        Returns:
+          A NumPy array containing the standard deviation of the signal.
+        """
+
+        sig_standard_deviation = np.std(self.input_signal)
+        return sig_standard_deviation
+
+    def signal_standard_deviation_in_frequency_domain(self):
+        """Calculates the standard deviation of a signal in the frequency domain.
+
+        Returns:
+          A NumPy array containing the standard deviation of the signal in the frequency domain.
+        """
+
+        stft = librosa.core.stft(self.input_signal, n_fft=self.frame_length, hop_length=self.hop_length)
+
+        # Calculate the standard deviation of the magnitude spectrum
+
+        sig_f_standard_deviation = np.std(np.abs(stft), axis=1)
+
+        # Convert the standard deviation back to the time domain
+
+        istft = librosa.core.istft(sig_f_standard_deviation, n_fft=self.frame_length, hop_length=self.hop_length)
+
+        return istft
+
+    def signal_variance(self):
+        """Calculates the variance of a signal.
+
+        Returns:
+          A NumPy array containing the variance of the signal.
+        """
+
+        variance = np.var(self.input_signal, axis=0)
+        return variance
