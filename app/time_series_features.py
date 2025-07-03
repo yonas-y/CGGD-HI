@@ -236,3 +236,41 @@ class signal_features:
 
         # Return the STFT.
         return D
+
+    def signal_spectrogram(self):
+        """
+        Computes the spectrogram of a signal using the Librosa library.
+
+        Returns:
+          A NumPy array containing the spectrogram of the signal.
+        """
+
+        # Compute the spectrogram.
+        S = librosa.core.stft(self.input_signal, n_fft=self.frame_length, hop_length=self.hop_length)
+
+        # Compute the magnitude of the spectrogram.
+        magnitude = np.abs(S)
+
+        # Compute the spectrogram in decibels.
+        spectrogram = 20 * np.log10(magnitude)
+
+        # Return the spectrogram.
+        return spectrogram
+
+    def signal_mel_spectrogram(self, N_mels=64):
+        """
+        Calculates the Mel Spectral coefficients!!!
+
+        :param N_mels: number of Mel bands to generate!
+
+        :return: Mel transform matrix, Mel transform matrix in DB.
+        """
+        # Compute mel spectrogram
+        mel_spectrogram = librosa.feature.melspectrogram(y=self.input_signal, sr=self.sample_rate,
+                                                         n_fft=self.frame_length, hop_length=self.hop_length,
+                                                         n_mels=N_mels)
+
+        # Convert power spectrogram to dB scale
+        mel_S_dB = librosa.power_to_db(mel_spectrogram, ref=np.max)
+
+        return mel_spectrogram, mel_S_dB
