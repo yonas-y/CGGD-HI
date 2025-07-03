@@ -5,7 +5,7 @@ from typing import Dict
 from app.config import setup, channel
 from pathlib import Path
 
-class FeaturePreprocessing:
+class feature_preprocessing:
     """
     A class used for preprocessing the extracted features from Pronostia dataset.
 
