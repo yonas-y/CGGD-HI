@@ -154,3 +154,28 @@ class signal_features:
 
         return kurtosis
 
+    def signal_waveform_factor(self):
+        """
+        Calculates the waveform factor of a signal.
+
+        Returns:
+          float: The waveform factor.
+        """
+
+        average = np.mean(self.input_signal)
+        peak = np.max(np.abs(self.input_signal))
+        return peak / average
+
+    def signal_crest_factor(self):
+        """
+        Calculates the crest factor of a signal.
+
+        Returns:
+          float: The crest factor.
+        """
+
+        peak = np.max(np.abs(self.input_signal))
+        rms = np.sqrt(np.mean(self.input_signal ** 2))
+        return peak / rms
+
+
