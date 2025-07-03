@@ -274,3 +274,20 @@ class signal_features:
         mel_S_dB = librosa.power_to_db(mel_spectrogram, ref=np.max)
 
         return mel_spectrogram, mel_S_dB
+
+    def signal_wavelet_transform(self, wavelet_name='db4'):
+        """
+        Calculates the wavelet transform of a signal.
+
+        Args:
+          wavelet_name: The name of the wavelet to use.
+
+        Returns:
+          A NumPy array containing the wavelet coefficients.
+        """
+
+        # Calculate the wavelet coefficients.
+        wave_coeffs = pywt.wavedec(self.input_signal, wavelet_name)
+
+        # Return the wavelet coefficients.
+        return wave_coeffs
