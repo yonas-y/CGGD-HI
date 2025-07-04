@@ -5,6 +5,45 @@ from typing_extensions import Annotated
 from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 
+
+def features_ene_rul_train(train_feature_list: list) -> List[np.ndarray]:
+    """
+    Calculated the scaled energy of the training samples in the run and their location in the run.
+    In addition, the RUL is assumed to be decreasing from 1 to 0 through the run.
+
+    :param train_feature_list: mel training feature list of the bearing under consideration.
+    :return: A list where each entry contains a stacked array with scaled energy, rul, and order.
+    """
+    combined_feat_list = []
+
+    for i in range(len(train_feature_list)):
+        mel_feature = train_feature_list[i]
+        # Compute mean energy per sample (over mel bands and channels)
+        mel_band_energies_mean = np.mean(mel_feature ** 2, axis=(1, 2))
+
+        # Convolve the energy to remove sharp fluctuations! Smooth with moving average (window size = 12)
+        mel_band_energies_smooth = uniform_filter1d(mel_band_energies_mean, size=12, mode='nearest')
+
+        # Convert to dB scale.
+        mel_band_energies_mean_db = librosa.power_to_db(mel_band_energies_smooth, ref=np.median)
+
+        # Scale the energy!
+        min_val = np.min(mel_band_energies_mean_db)
+        max_val = np.max(mel_band_energies_mean_db)
+        mel_band_energies_mean_scaled = (mel_band_energies_mean_db - min_val) / (max_val - min_val)
+
+        # Calculate a decreasing RUL and increasing numerical ordering of the samples!
+        RUL = np.linspace(1.0, 0.0, num=mel_feature.shape[0])
+        order = np.array(range(1, mel_feature.shape[0] + 1))
+
+        combined = np.stack([mel_band_energies_mean_scaled, RUL, order], axis=1)
+
+        print("Here")
+        combined_feat_list.append(combined)
+
+    return combined_feat_list
+
+
 class feature_preprocessing:
     """
     A class used for preprocessing the extracted features from Pronostia dataset.
@@ -70,6 +109,10 @@ class feature_preprocessing:
         :return:
         """
         train_features, test_features = bearing_feature_list[:2], bearing_feature_list[2:]
+        # Keep track of original lengths
+        train_lengths = [arr.shape[0] for arr in train_features]
+        test_lengths = [arr.shape[0] for arr in test_features]
+
         train_feat_conc = np.concatenate(train_features)
         test_feat_conc = np.concatenate(test_features)
 
@@ -85,8 +128,15 @@ class feature_preprocessing:
         train_scaled = train_features_scaled.reshape(train_feat_conc.shape)
         test_scaled = test_features_scaled.reshape(test_feat_conc.shape)
 
+        # Split back to original list structure
+        train_split_indices = np.cumsum(train_lengths)[:-1]
+        test_split_indices = np.cumsum(test_lengths)[:-1]
+
+        train_scaled_list = np.split(train_scaled, train_split_indices, axis=0)
+        test_scaled_list = np.split(test_scaled, test_split_indices, axis=0)
+
         output_dir = Path("output/scaler")
         output_dir.mkdir(exist_ok=True)
         joblib.dump(self.scaler, output_dir / f"{self.setup}_scaler.pkl")  # save
 
-        return train_feat_conc, test_feat_conc, train_scaled, test_scaled
+        return train_features, test_features, train_scaled_list, test_scaled_list
