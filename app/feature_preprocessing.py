@@ -97,10 +97,10 @@ class feature_preprocessing:
 
 
     def split_scale_features(self, bearing_feature_list: list) -> Tuple[
-        Annotated[np.ndarray, "X_train"],
-        Annotated[np.ndarray, "X_test"],
-        Annotated[np.ndarray, "X_train_scaled"],
-        Annotated[np.ndarray, "X_test_scaled"]
+        List[np.ndarray],   # "X_train"
+        List[np.ndarray],   # "X_test"
+        List[np.ndarray],   # "X_train_scaled"
+        List[np.ndarray],   # "X_test_scaled"
     ]:
         """
         Creates train and test sets using the bearing features dictionary.
