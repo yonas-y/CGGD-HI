@@ -1,0 +1,50 @@
+from zenml import step
+import os
+import logging
+import numpy as np
+from typing import Tuple
+from typing_extensions import Annotated
+
+from app.feature_extraction import feature_extraction
+from app.feature_preprocessing import feature_preprocessing
+
+logger = logging.getLogger(__name__)
+
+@step(enable_cache=True)
+def feature_extraction_step(pickle_dir, feature_dir) -> None:
+    """
+    Step to extract features from the input pickle data.
+    """
+    logger.info(f"📦 Extracting features ...")
+    feature_extraction(pickle_dir, feature_dir)
+
+    return
+
+@step(enable_cache=True)
+def feature_preprocessing_step(feature_directory: str, setup_used: str, channel_used: str) -> Tuple[
+    Annotated[np.ndarray, "X_train"],
+    Annotated[np.ndarray, "X_test"],
+    Annotated[np.ndarray, "X_train_scaled"],
+    Annotated[np.ndarray, "X_test_scaled"]
+]:
+    """
+    Load mel features from the feature directory, then split and scale them
+    into train/test sets.
+    """
+    # Create the preprocessing class!
+    logger.info("Initializing feature preprocessing...")
+    feature_preprocess = feature_preprocessing(feature_directory, setup_used, channel_used)
+
+    # Load the features!
+    logger.info("Loading mel features...")
+    feature_db_list = feature_preprocess.load_mel_features()
+
+    if not feature_db_list:
+        raise ValueError("No features loaded; check your feature directory or config.")
+
+    # Split and scale the features!
+    logger.info("Splitting and scaling features...")
+    X_train, X_test, X_train_scaled, X_test_scaled = feature_preprocess.split_scale_features(feature_db_list)
+
+    logger.info("Feature preprocessing completed successfully.")
+    return X_train, X_test, X_train_scaled, X_test_scaled
