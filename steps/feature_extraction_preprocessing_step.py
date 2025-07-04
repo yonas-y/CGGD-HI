@@ -2,7 +2,7 @@ from zenml import step
 import os
 import logging
 import numpy as np
-from typing import Tuple
+from typing import List, Tuple
 from typing_extensions import Annotated
 
 from app.feature_extraction import feature_extraction
@@ -23,10 +23,9 @@ def feature_extraction_step(pickle_dir, feature_dir) -> None:
 
 @step(enable_cache=True)
 def feature_preprocessing_step(feature_directory: str, setup_used: str, channel_used: str) -> Tuple[
-    Annotated[np.ndarray, "X_train"],
-    Annotated[np.ndarray, "X_test"],
-    Annotated[np.ndarray, "X_train_scaled"],
-    Annotated[np.ndarray, "X_test_scaled"]
+    List[np.ndarray],       # X_train_scaled
+    List[np.ndarray],       # Ene_RUL_Order_train
+    List[np.ndarray]        # X_test_scaled
 ]:
     """
     Load mel features from the feature directory, then split and scale them
