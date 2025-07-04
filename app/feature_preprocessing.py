@@ -4,7 +4,8 @@ from typing import List, Tuple
 from typing_extensions import Annotated
 from pathlib import Path
 from sklearn.preprocessing import StandardScaler
-
+from scipy.ndimage import uniform_filter1d
+import librosa
 
 def features_ene_rul_train(train_feature_list: list) -> List[np.ndarray]:
     """
@@ -32,13 +33,12 @@ def features_ene_rul_train(train_feature_list: list) -> List[np.ndarray]:
         max_val = np.max(mel_band_energies_mean_db)
         mel_band_energies_mean_scaled = (mel_band_energies_mean_db - min_val) / (max_val - min_val)
 
-        # Calculate a decreasing RUL and increasing numerical ordering of the samples!
+        # Calculate a decreasing RUL and numerical ordering of the samples in time!
         RUL = np.linspace(1.0, 0.0, num=mel_feature.shape[0])
         order = np.array(range(1, mel_feature.shape[0] + 1))
 
         combined = np.stack([mel_band_energies_mean_scaled, RUL, order], axis=1)
 
-        print("Here")
         combined_feat_list.append(combined)
 
     return combined_feat_list
