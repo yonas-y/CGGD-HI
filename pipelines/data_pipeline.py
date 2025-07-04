@@ -1,7 +1,8 @@
 from zenml import pipeline
 from steps.data_import_step import import_and_catch_data_step
-from steps.feature_extraction_step import feature_extraction_step
-from app.config import TRAIN_RAW_DATA_DIR, TEST_RAW_DATA_DIR, PICKLE_TRAIN_DIR, PICKLE_TEST_DIR, FEATURE_DIR
+from steps.feature_extraction_preprocessing_step import feature_extraction_step, feature_preprocessing_step
+from app.config import TRAIN_RAW_DATA_DIR, TEST_RAW_DATA_DIR, PICKLE_TRAIN_DIR, PICKLE_TEST_DIR
+from app.config import FEATURE_DIR, setup, channel
 
 @pipeline
 def data_pipeline():
@@ -13,4 +14,11 @@ def data_pipeline():
     feature_extraction_step(PICKLE_TRAIN_DIR, FEATURE_DIR) # Feature extraction for the training set!
     feature_extraction_step(PICKLE_TEST_DIR, FEATURE_DIR) # Feature extraction for the test set!
 
+    # Feature Preprocessing step!
+    X_train, X_test, X_train_scaled, X_test_scaled = feature_preprocessing_step(
+        feature_directory=FEATURE_DIR,
+        setup_used=setup,
+        channel_used=channel
+    )
 
+    return X_train_scaled, X_test_scaled
