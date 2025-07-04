@@ -15,10 +15,10 @@ def data_pipeline():
     feature_extraction_step(PICKLE_TEST_DIR, FEATURE_DIR) # Feature extraction for the test set!
 
     # Feature Preprocessing step!
-    X_train, X_test, X_train_scaled, X_test_scaled = feature_preprocessing_step(
+    X_train_scaled, Ene_RUL_order_train, X_test_scaled = feature_preprocessing_step(
         feature_directory=FEATURE_DIR,
         setup_used=setup,
         channel_used=channel
     )
 
-    return X_train_scaled, X_test_scaled
+    return X_train_scaled, Ene_RUL_order_train, X_test_scaled
