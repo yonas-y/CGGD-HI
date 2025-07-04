@@ -7,6 +7,7 @@ from typing_extensions import Annotated
 
 from app.feature_extraction import feature_extraction
 from app.feature_preprocessing import feature_preprocessing
+from app.feature_preprocessing import features_ene_rul_train
 
 logger = logging.getLogger(__name__)
 
@@ -46,5 +47,9 @@ def feature_preprocessing_step(feature_directory: str, setup_used: str, channel_
     logger.info("Splitting and scaling features...")
     X_train, X_test, X_train_scaled, X_test_scaled = feature_preprocess.split_scale_features(feature_db_list)
 
+    # Extract the scaled energy, RUL and order of the training samples!
+    logger.info("Calculating the feature energy ...")
+    Ene_RUL_order_train = features_ene_rul_train(X_train)
+
     logger.info("Feature preprocessing completed successfully.")
-    return X_train, X_test, X_train_scaled, X_test_scaled
+    return X_train_scaled, Ene_RUL_order_train, X_test_scaled
