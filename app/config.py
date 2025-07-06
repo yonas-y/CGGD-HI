@@ -1,6 +1,8 @@
 """
 Contains Configuration (data, names, paths, .....).
 """
+import tensorflow as tf
+import random
 
 # ========== Directories!!! ============== #
 """
