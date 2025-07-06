@@ -1,7 +1,7 @@
 from pathlib import Path
 import pandas as pd
 import numpy as np
-from app.config import SampleRate, OneSec_Samples, frame_length, hop_length, n_mels
+from app.active_config import cfg
 from app.time_series_features import signal_features
 
 
@@ -35,13 +35,13 @@ def feature_extraction(PICKLE_DIR, FEATURE_OUT_DIR) -> None:
             continue
 
         ACM_V_Feat_list, ACM_H_Feat_list = [], []
-        for sample in range(0, len(bearing_data), OneSec_Samples):
-            ACM_V_sample = bearing_data_V[sample:sample + OneSec_Samples]
-            ACM_H_sample = bearing_data_H[sample:sample + OneSec_Samples]
+        for sample in range(0, len(bearing_data), cfg.OneSec_Samples):
+            ACM_V_sample = bearing_data_V[sample:sample + cfg.OneSec_Samples]
+            ACM_H_sample = bearing_data_H[sample:sample + cfg.OneSec_Samples]
 
             # Vertical and Horizontal classes!!
-            feat_class_V = signal_features(ACM_V_sample, SampleRate, frame_length, hop_length)
-            feat_class_H = signal_features(ACM_H_sample, SampleRate, frame_length, hop_length)
+            feat_class_V = signal_features(ACM_V_sample, cfg.SampleRate, cfg.frame_length, cfg.hop_length)
+            feat_class_H = signal_features(ACM_H_sample, cfg.SampleRate, cfg.frame_length, cfg.hop_length)
 
             """
             Possible to extract features and use it later for model input from the 
@@ -54,8 +54,8 @@ def feature_extraction(PICKLE_DIR, FEATURE_OUT_DIR) -> None:
             """
 
             # Mel spectral matrices of the frame!
-            _, mel_S_dB_V = feat_class_V.signal_mel_spectrogram(N_mels=n_mels)
-            _, mel_S_dB_H = feat_class_H.signal_mel_spectrogram(N_mels=n_mels)
+            _, mel_S_dB_V = feat_class_V.signal_mel_spectrogram(N_mels=cfg.n_mels)
+            _, mel_S_dB_H = feat_class_H.signal_mel_spectrogram(N_mels=cfg.n_mels)
 
             # Collect flattened features into lists
             ACM_V_Feat_list.append(mel_S_dB_V.ravel())
@@ -69,6 +69,6 @@ def feature_extraction(PICKLE_DIR, FEATURE_OUT_DIR) -> None:
         ACM_Feat = np.concatenate((ACM_V_Feat, ACM_H_Feat), axis=2)  # shape: (n_samples, n_features, 2)
 
         # Save the features for later use as a numpy file!
-        np.save(FEATURE_OUT_DIR / f"{file.stem[:10]}_feat_mel_DB_{n_mels}.npy", ACM_Feat)
+        np.save(FEATURE_OUT_DIR / f"{file.stem[:10]}_feat_mel_DB_{cfg.n_mels}.npy", ACM_Feat)
 
     return
