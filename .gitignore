@@ -83,3 +83,4 @@ output/
 # Test Jupyter Script!!
 Test_Scripts.ipynb
 /output
+/data
