@@ -32,3 +32,18 @@ Update these parameters for feature preprocessing and training!
 """
 setup='Bearing1'        # On which bearing to work on. ('Bearing1', 'Bearing2' or 'Bearing3')
 channel = 'both'        # Which channel of the features to use. ('vertical', 'horizontal' or 'both')
+n_channels = 2
+
+# ===== Model architecture hyperparameters ========== #
+"""
+These are the hyperparameters used in the convolutional autoencoder model.
+"""
+input_sample_shape = (n_mels, n_channels)
+encoding_n = 8
+regularization = 1e-3
+dropout_rate = 0.0
+pooling_size = 2
+kernel_size_conv = 3
+stride_convolutional = 2
+activation_function = tf.keras.layers.ReLU()
+kernel_init = tf.keras.initializers.GlorotNormal(seed=random.randint(0, 1e6))
