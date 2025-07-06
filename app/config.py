@@ -48,13 +48,15 @@ class DatasetConfig:
     bearing_used: str
     channel: str = 'both'   # Which channel of the features to use. ('vertical', 'horizontal' or 'both').
     n_channels: int = 2     # When "both" is use set it 2, else set it to 1.
+
+    # Dataset-specific optional paths
+    TRAIN_RAW_DATA_DIR: Optional[Path] = None
+    TEST_RAW_DATA_DIR: Optional[Path] = None
+    PICKLE_TRAIN_DIR: Optional[Path] = None
+    PICKLE_TEST_DIR: Optional[Path] = None
+
     model_hyperparams: Optional[ModelHyperparameters] = None
     extra_params: Optional[dict] = None
-    # TRAIN_RAW_DATA_DIR: Path
-    # TEST_RAW_DATA_DIR: Path
-    # PICKLE_TRAIN_DIR: Path
-    # PICKLE_TEST_DIR: Path
-
 
 # ========= Function to build model hyperparameters from dataset config ========= #
 def build_model_hyperparams(dataset_cfg: DatasetConfig) -> ModelHyperparameters:
@@ -75,6 +77,10 @@ CONFIGS = {
     "pronostia": DatasetConfig(
         SETUP_Name="pronostia",
         MODEL_OUTPUT_DIR=Path("output/pronostia"),
+        TRAIN_RAW_DATA_DIR=Path("data/raw/pronostia/Learning_set"),
+        TEST_RAW_DATA_DIR=Path("data/raw/pronostia/Test_set"),
+        PICKLE_TRAIN_DIR=Path("data/pickles/pronostia/training"),
+        PICKLE_TEST_DIR=Path("data/pickles/pronostia/test"),
         FEATURE_DIR=Path("data/features/pronostia_mel_features"),
         SampleRate=25600,
         OneSec_Samples=2560,
@@ -86,12 +92,6 @@ CONFIGS = {
         channel='both',
         n_channels=2,
         model_hyperparams=None,
-        extra_params = {
-            TRAIN_RAW_DATA_DIR: Path("data/raw/pronostia/Learning_set"),
-            TEST_RAW_DATA_DIR: Path("data/raw/pronostia/Test_set"),
-            PICKLE_TRAIN_DIR: Path("data/pickles/pronostia/training"),
-            PICKLE_TEST_DIR: Path("data/pickles/pronostia/test")
-        }
     ),
     "XJTU_SY": DatasetConfig(
         SETUP_Name="XJTU_SY",
@@ -107,13 +107,7 @@ CONFIGS = {
         channel='both',
         n_channels=2,
         model_hyperparams=None,
-        extra_params= {
-            TRAIN_RAW_DATA_DIR: Path("data/raw/XJTU_SY/Learning_set"),
-            TEST_RAW_DATA_DIR: Path("data/raw/XJTU_SY/Test_set"),
-            PICKLE_TRAIN_DIR: Path("data/pickles/XJTU_SY/training"),
-            PICKLE_TEST_DIR: Path("data/pickles/XJTU_SY/test")
-        }
-
+        extra_params= None
     )
 }
 
