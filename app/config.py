@@ -1,51 +1,127 @@
 """
-Contains Configuration (data, names, paths, .....).
+Project Configuration File
+
+Contains:
+- Dataset-specific configuration
+- Model architecture hyperparameters
 """
+
+from dataclasses import dataclass
+from typing import List, Optional
+from pathlib import Path
 import tensorflow as tf
 import random
 
-# ========== Directories!!! ============== #
-"""
-Directories for Data, Features, Model Parameters and ....
-"""
-MODEL_DIR = "output"
-TRAIN_RAW_DATA_DIR = "data/raw/Pronostia/Learning_set"
-TEST_RAW_DATA_DIR = "data/raw/Pronostia/Test_set"
-PICKLE_TRAIN_DIR = "data/pickles/training"
-PICKLE_TEST_DIR = "data/pickles/test"
-FEATURE_DIR = "data/features/mel_features"
-# MODEL_PATH = f"{MODEL_DIR}/ocsvm_model.pkl"
-# SCALER_PATH = f"{MODEL_DIR}/scaler.pkl"
+# ========= Model architecture hyperparameters ========= #
+@dataclass
+class ModelHyperparameters:
+    input_sample_shape: tuple
+    encoding_n: int
+    regularization: float
+    dropout_rate: float
+    pooling_size: int
+    kernel_size_conv: int
+    stride_convolutional: int
+    activation_function: tf.keras.layers.Layer
+    kernel_init: tf.keras.initializers.Initializer
+
+# ========= Dataset configuration ========= #
+@dataclass
+class DatasetConfig:
+    """
+    Configuration for a specific dataset.
+    """
+    # Data and Features Directories!
+    SETUP_Name: str
+    MODEL_OUTPUT_DIR: Path
+    FEATURE_DIR: Path
+
+    # Parameters from feature extraction!
+    SampleRate: int            # sampling rate of the incoming signal.
+    OneSec_Samples: int        # samples representative of 1 sec duration.
+    frame_length: int          # number of FFT components.
+    hop_length: int            # hop length for spectrogram frames.
+    n_mels: int                # number of Mel bands to generate.
+
+    # Parameters for feature preprocessing!
+    available_bearings: List[str]  # On which bearing to work on.
+    bearing_used: str
+    channel: str = 'both'   # Which channel of the features to use. ('vertical', 'horizontal' or 'both').
+    n_channels: int = 2     # When "both" is use set it 2, else set it to 1.
+    model_hyperparams: Optional[ModelHyperparameters] = None
+    extra_params: Optional[dict] = None
+    # TRAIN_RAW_DATA_DIR: Path
+    # TEST_RAW_DATA_DIR: Path
+    # PICKLE_TRAIN_DIR: Path
+    # PICKLE_TEST_DIR: Path
 
 
-# ========== Parameters from Pronostia dataset! ================== #
-"""
-Important parameters about the Pronostia dataset for feature extraction.!!
-"""
-SampleRate = 25600                          # sampling rate of the incoming signal
-OneSec_Samples = 2560                         # samples representative of 1 sec duration.
-frame_length = 2560                         # number of FFT components
-hop_length = 2561                           # hop length for spectrogram frames
-n_mels = 256                                # number of Mel bands to generate
+# ========= Function to build model hyperparameters from dataset config ========= #
+def build_model_hyperparams(dataset_cfg: DatasetConfig) -> ModelHyperparameters:
+    return ModelHyperparameters(
+        input_sample_shape=(dataset_cfg.n_mels, dataset_cfg.n_channels),
+        encoding_n=8,
+        regularization=1e-3,
+        dropout_rate=0.0,
+        pooling_size=2,
+        kernel_size_conv=3,
+        stride_convolutional=2,
+        activation_function=tf.keras.layers.ReLU(),
+        kernel_init=tf.keras.initializers.GlorotNormal(seed=random.randint(0, 1e6))
+    )
 
-# ======== Parameters for feature preprocessing! ================= #
-"""
-Update these parameters for feature preprocessing and training!
-"""
-setup='Bearing1'        # On which bearing to work on. ('Bearing1', 'Bearing2' or 'Bearing3')
-channel = 'both'        # Which channel of the features to use. ('vertical', 'horizontal' or 'both')
-n_channels = 2
+# ========= Dataset configurations ========= #
+CONFIGS = {
+    "pronostia": DatasetConfig(
+        SETUP_Name="pronostia",
+        MODEL_OUTPUT_DIR=Path("output/pronostia"),
+        FEATURE_DIR=Path("data/features/pronostia_mel_features"),
+        SampleRate=25600,
+        OneSec_Samples=2560,
+        frame_length=2560,
+        hop_length=2561,
+        n_mels=256,
+        available_bearings=['Bearing1', 'Bearing2', 'Bearing3'],
+        bearing_used='Bearing1',
+        channel='both',
+        n_channels=2,
+        model_hyperparams=None,
+        extra_params = {
+            TRAIN_RAW_DATA_DIR: Path("data/raw/pronostia/Learning_set"),
+            TEST_RAW_DATA_DIR: Path("data/raw/pronostia/Test_set"),
+            PICKLE_TRAIN_DIR: Path("data/pickles/pronostia/training"),
+            PICKLE_TEST_DIR: Path("data/pickles/pronostia/test")
+        }
+    ),
+    "XJTU_SY": DatasetConfig(
+        SETUP_Name="XJTU_SY",
+        MODEL_OUTPUT_DIR=Path("output/XJTU_SY"),
+        FEATURE_DIR=Path("data/features/XJTU_SY_mel_features"),
+        SampleRate=25600,
+        OneSec_Samples=2560,
+        frame_length=2560,
+        hop_length=2561,
+        n_mels=256,
+        available_bearings=['Bearing1', 'Bearing2', 'Bearing3', 'Bearing4'],
+        bearing_used='Bearing1',
+        channel='both',
+        n_channels=2,
+        model_hyperparams=None,
+        extra_params= {
+            TRAIN_RAW_DATA_DIR: Path("data/raw/XJTU_SY/Learning_set"),
+            TEST_RAW_DATA_DIR: Path("data/raw/XJTU_SY/Test_set"),
+            PICKLE_TRAIN_DIR: Path("data/pickles/XJTU_SY/training"),
+            PICKLE_TEST_DIR: Path("data/pickles/XJTU_SY/test")
+        }
 
-# ===== Model architecture hyperparameters ========== #
-"""
-These are the hyperparameters used in the convolutional autoencoder model.
-"""
-input_sample_shape = (n_mels, n_channels)
-encoding_n = 8
-regularization = 1e-3
-dropout_rate = 0.0
-pooling_size = 2
-kernel_size_conv = 3
-stride_convolutional = 2
-activation_function = tf.keras.layers.ReLU()
-kernel_init = tf.keras.initializers.GlorotNormal(seed=random.randint(0, 1e6))
+    )
+}
+
+# ========= Access function ========= #
+def get_config(setup_used: str) -> DatasetConfig:
+    cfg = CONFIGS.get(setup_used)
+    if cfg is None:
+        raise ValueError(f"Unknown SETUP: '{setup_used}'. Available: {list(CONFIGS.keys())}")
+    if cfg.model_hyperparams is None:
+        cfg.model_hyperparams = build_model_hyperparams(cfg)
+    return cfg
