@@ -46,7 +46,7 @@ def features_ene_rul_train(train_feature_list: list) -> List[np.ndarray]:
 
 class feature_preprocessing:
     """
-    A class used for preprocessing the extracted features from Pronostia dataset.
+    A class used for preprocessing the extracted features from pronostia dataset.
 
     Methods
     -------
