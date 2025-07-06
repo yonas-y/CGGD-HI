@@ -79,9 +79,6 @@ coverage.xml
 # Test outputs
 test_output/
 output/
-data/features/
-data/pickles/
-data/raw/
 
 # Test Jupyter Script!!
 Test_Scripts.ipynb
