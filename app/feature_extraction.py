@@ -46,8 +46,8 @@ def feature_extraction(PICKLE_DIR: Path, FEATURE_OUT_DIR: Path) -> None:
             ACM_H_sample = bearing_data_H[sample:sample + cfg.frame_length]
 
             # Vertical and Horizontal classes!!
-            feat_class_V = signal_features(ACM_V_sample, cfg.SampleRate, cfg.frame_length, cfg.hop_length)
-            feat_class_H = signal_features(ACM_H_sample, cfg.SampleRate, cfg.frame_length, cfg.hop_length)
+            feat_class_V = signal_features(ACM_V_sample, cfg.SampleRate, cfg.n_fft, cfg.hop_length)
+            feat_class_H = signal_features(ACM_H_sample, cfg.SampleRate, cfg.n_fft, cfg.hop_length)
 
             """
             Possible to extract features and use it later for model input from the 
@@ -62,6 +62,10 @@ def feature_extraction(PICKLE_DIR: Path, FEATURE_OUT_DIR: Path) -> None:
             # Mel spectral matrices of the frame!
             _, mel_S_dB_V = feat_class_V.signal_mel_spectrogram(N_mels=cfg.n_mels)
             _, mel_S_dB_H = feat_class_H.signal_mel_spectrogram(N_mels=cfg.n_mels)
+
+            # Aggregate over time axis
+            mel_S_dB_V = np.mean(mel_S_dB_V, axis=1)
+            mel_S_dB_H = np.mean(mel_S_dB_H, axis=1)
 
             # Collect flattened features into lists
             ACM_V_Feat_list.append(mel_S_dB_V.ravel())

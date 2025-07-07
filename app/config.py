@@ -38,9 +38,9 @@ class DatasetConfig:
 
     # Parameters from feature extraction!
     SampleRate: int            # sampling rate of the incoming signal.
-    OneSec_Samples: int        # samples representative of 1 sec duration.
-    frame_length: int          # number of FFT components.
-    hop_length: int            # hop length for spectrogram frames.
+    frame_length: int          # Collected continuous samples per frame.
+    n_fft: int                 # smaller n_fft → better time resolution
+    hop_length: int            # smaller hop_length → more frames
     n_mels: int                # number of Mel bands to generate.
 
     # Parameters for feature preprocessing!
@@ -83,9 +83,9 @@ CONFIGS = {
         PICKLE_TEST_DIR=Path("data/raw_pickles/pronostia/test"),
         FEATURE_DIR=Path("data/features/pronostia_mel_features"),
         SampleRate=25600,
-        OneSec_Samples=2560,
         frame_length=2560,
-        hop_length=2561,
+        n_fft = 1024,
+        hop_length=512,
         n_mels=256,
         available_bearings=['Bearing1', 'Bearing2', 'Bearing3'],
         bearing_used='Bearing1',
@@ -98,9 +98,9 @@ CONFIGS = {
         OUTPUT_DIR=Path("output/scaler/XJTU_SY"),
         FEATURE_DIR=Path("data/features/XJTU_SY_mel_features"),
         SampleRate=25600,
-        OneSec_Samples=2560,
-        frame_length=2560,
-        hop_length=2561,
+        frame_length=32768,
+        n_fft = 1024,
+        hop_length=512,
         n_mels=256,
         available_bearings=['Bearing1', 'Bearing2', 'Bearing3', 'Bearing4'],
         bearing_used='Bearing1',
