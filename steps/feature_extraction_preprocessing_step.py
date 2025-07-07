@@ -11,8 +11,8 @@ from app.feature_preprocessing import features_ene_rul_train
 
 logger = logging.getLogger(__name__)
 
-@step(enable_cache=True)
-def feature_extraction_step(pickle_dir, feature_dir) -> None:
+@step(enable_cache=False)
+def feature_extraction_step(pickle_dir: Path, feature_dir: Path) -> None:
     """
     Step to extract features from the input pickle data.
     """
@@ -21,7 +21,7 @@ def feature_extraction_step(pickle_dir, feature_dir) -> None:
 
     return
 
-@step(enable_cache=True)
+@step(enable_cache=False)
 def feature_preprocessing_step(feature_directory: Path, output_directory: Path,
                                bearing_used: str, channel_used: str) -> Tuple[
     List[np.ndarray],       # X_train_scaled
