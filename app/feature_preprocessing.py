@@ -50,23 +50,23 @@ class feature_preprocessing:
 
     Methods
     -------
-    load_features(feature_directory, setup, channel): Loads features from the directory containing features.
+    load_features(feature_directory, bearing, channel): Loads features from the directory containing features.
 
     split_scale_features(): Splits the whole data into train and text and scales them.
     """
 
-    def __init__(self, feature_directory: str, setup_used: str, channel_used: str):
+    def __init__(self, feature_directory: Path, bearing_used: str, channel_used: str):
         """
         Initialize with the feature directory.
 
         Args:
             feature_directory: The path to the directory containing features.
-            setup_used: which bearing to load!
+            bearing_used: which bearing to load!
             channel_used: denotes the channel to use! vertical, horizontal or both!
         """
         self.feature_dir = feature_directory
         self.scaler = StandardScaler()
-        self.setup = setup_used
+        self.bearing = bearing_used
         self.channel = channel_used
 
     def load_mel_features(self) -> List[np.ndarray]:
@@ -74,11 +74,10 @@ class feature_preprocessing:
         Loads the bearing features!
 
         """
-        feature_dir = Path(self.feature_dir)
         mel_db_feat_list = []
 
-        for file in feature_dir.iterdir():
-            if self.setup in file.name:
+        for file in self.feature_dir.iterdir():
+            if self.bearing in file.name:
                 # bearing_name = file.name[:10]
                 mel_db_feat = np.load(file)
 
@@ -137,6 +136,6 @@ class feature_preprocessing:
 
         output_dir = Path("output/scaler")
         output_dir.mkdir(exist_ok=True)
-        joblib.dump(self.scaler, output_dir / f"{self.setup}_scaler.pkl")  # save
+        joblib.dump(self.scaler, output_dir / f"{self.bearing}_scaler.pkl")  # save
 
         return train_features, test_features, train_scaled_list, test_scaled_list
