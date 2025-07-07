@@ -3,7 +3,7 @@ import os
 import logging
 import numpy as np
 from typing import List, Tuple
-from typing_extensions import Annotated
+from pathlib import Path
 
 from app.feature_extraction import feature_extraction
 from app.feature_preprocessing import feature_preprocessing
@@ -22,7 +22,7 @@ def feature_extraction_step(pickle_dir, feature_dir) -> None:
     return
 
 @step(enable_cache=True)
-def feature_preprocessing_step(feature_directory: str, setup_used: str, channel_used: str) -> Tuple[
+def feature_preprocessing_step(feature_directory: Path, bearing_used: str, channel_used: str) -> Tuple[
     List[np.ndarray],       # X_train_scaled
     List[np.ndarray],       # Ene_RUL_Order_train
     List[np.ndarray]        # X_test_scaled
@@ -33,7 +33,7 @@ def feature_preprocessing_step(feature_directory: str, setup_used: str, channel_
     """
     # Create the preprocessing class!
     logger.info("Initializing feature preprocessing...")
-    feature_preprocess = feature_preprocessing(feature_directory, setup_used, channel_used)
+    feature_preprocess = feature_preprocessing(feature_directory, bearing_used, channel_used)
 
     # Load the features!
     logger.info("Loading mel features...")
