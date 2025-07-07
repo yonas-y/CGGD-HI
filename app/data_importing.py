@@ -25,7 +25,13 @@ def import_bearing_data_to_pickle(data_directory_path, pickle_directory_path):
             raise FileNotFoundError(f"No subdirectories found in folder: {data_dir}")
 
         for subdir in subdirs:
-            print(f"Importing: {subdir}")
+            output_pickle = pickle_dir / f"{subdir.name}_DF.pkl"
+
+            if output_pickle.exists():
+                print(f"[✓] Skipping {subdir.name} — already imported!")
+                continue
+
+            print(f"[→] Importing {subdir.name}")
             acm_dfs = []
 
             for file in subdir.glob("acc*.csv"):  # Match only files starting with 'acc' and ending with .csv
@@ -56,8 +62,7 @@ def import_bearing_data_to_pickle(data_directory_path, pickle_directory_path):
                 acm_df_new = acm_df.drop(['Hour', 'Minute', 'Second', 'micro-second'], axis=1)
                 acm_df_new = acm_df_new.reset_index(drop=True)
 
-                # Save to pickle inside the 'pickles' directory
-                output_pickle = pickle_dir / f"{subdir.name}_DF.pkl"
+                # Save to pickle inside the output 'pickles' directory
                 acm_df_new.to_pickle(output_pickle)
 
             print('Imported to DF:', subdir)
