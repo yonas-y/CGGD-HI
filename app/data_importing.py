@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 
 
-def import_bearing_data_to_pickle(data_directory_path, pickle_directory_path):
+def import_pronostia_data_to_pickle(data_directory_path, pickle_directory_path):
     """
     Imports and converts the original bearing accelerometer CSV file from the given directory into pandas dataframe!!
     Then it stores as a pickle file in a directory!
@@ -66,6 +66,60 @@ def import_bearing_data_to_pickle(data_directory_path, pickle_directory_path):
                 acm_df_new.to_pickle(output_pickle)
 
             print('Imported to DF:', subdir)
+    except FileNotFoundError as e:
+        print(e)
+    return
+
+
+def import_XJTU_SY_data_to_pickle(data_directory_path, pickle_directory_path):
+    """
+    Imports and converts the original bearing accelerometer CSV file from the given directory into pandas dataframe!!
+    Then it stores as a pickle file in a directory!
+
+    :param data_directory_path: The path to the file's directory!
+    :param pickle_directory_path: The path to store the converted pickle directory!'
+    """
+    data_dir = Path(data_directory_path)
+    pickle_dir = Path(pickle_directory_path)
+    pickle_dir.mkdir(exist_ok=True)  # create the pickles directory if it doesn't exist
+
+    columns = ['Horiz. accel.', 'Vert. accel.']
+    print('Importing Started!')
+    try:
+        subdirs = [subdir for subdir in data_dir.iterdir() if subdir.is_dir()]
+        if not subdirs:
+            raise FileNotFoundError(f"No subdirectories found in folder: {data_dir}")
+
+        for subdir in subdirs:
+            output_pickle = pickle_dir / f"{subdir.name}_DF.pkl"
+
+            if output_pickle.exists():
+                print(f"[✓] Skipping {subdir.name} — already imported!")
+                continue
+
+            print(f"[→] Importing {subdir.name}")
+            acm_dfs = []
+
+            for file in subdir.glob("*.csv"):  # Match only files ending with .csv
+                try:
+                    # Read in chunk to keep memory usage manageable!
+                    for chunk in pd.read_csv(file, chunksize=50000, header=None):
+                        acm_dfs.append(chunk.iloc[1:])  # Drop the first row which is a column title.
+                except pd.errors.EmptyDataError:
+                    print(f"Skipped empty file: {file}")
+
+                except Exception as file_error:
+                    print(f"Failed to read {file}: {file_error}")
+
+            if acm_dfs:
+                acm_df = pd.concat(acm_dfs, ignore_index=True)
+                acm_df.columns = columns
+
+                # Save to pickle inside the output 'pickles' directory
+                acm_df.to_pickle(output_pickle)
+
+            print('Imported to DF:', subdir, 'and total number of files read are:', len(acm_dfs))
+
     except FileNotFoundError as e:
         print(e)
     return
