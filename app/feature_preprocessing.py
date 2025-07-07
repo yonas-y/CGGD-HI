@@ -55,16 +55,18 @@ class feature_preprocessing:
     split_scale_features(): Splits the whole data into train and text and scales them.
     """
 
-    def __init__(self, feature_directory: Path, bearing_used: str, channel_used: str):
+    def __init__(self, feature_directory: Path, output_directory: Path, bearing_used: str, channel_used: str):
         """
         Initialize with the feature directory.
 
         Args:
             feature_directory: The path to the directory containing features.
+            output_directory: The output path where to store different step outputs!
             bearing_used: which bearing to load!
             channel_used: denotes the channel to use! vertical, horizontal or both!
         """
         self.feature_dir = feature_directory
+        self.output_dir = output_directory
         self.scaler = StandardScaler()
         self.bearing = bearing_used
         self.channel = channel_used
@@ -134,8 +136,7 @@ class feature_preprocessing:
         train_scaled_list = np.split(train_scaled, train_split_indices, axis=0)
         test_scaled_list = np.split(test_scaled, test_split_indices, axis=0)
 
-        output_dir = Path("output/scaler")
-        output_dir.mkdir(exist_ok=True)
-        joblib.dump(self.scaler, output_dir / f"{self.bearing}_scaler.pkl")  # save
+        self.output_dir.mkdir(exist_ok=True)
+        joblib.dump(self.scaler, self.output_dir / f"{self.bearing}_scaler.pkl")  # save the scaler!
 
         return train_features, test_features, train_scaled_list, test_scaled_list

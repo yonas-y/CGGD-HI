@@ -16,6 +16,7 @@ def data_pipeline():
     # Feature Preprocessing step!
     X_train_scaled, Ene_RUL_order_train, X_test_scaled = feature_preprocessing_step(
         feature_directory=cfg.FEATURE_DIR,
+        output_directory=cfg.OUTPUT_DIR,
         bearing_used=cfg.bearing_used,
         channel_used=cfg.channel
     )
