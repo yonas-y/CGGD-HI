@@ -33,7 +33,7 @@ class DatasetConfig:
     """
     # Data and Features Directories!
     SETUP_Name: str
-    MODEL_OUTPUT_DIR: Path
+    OUTPUT_DIR: Path
     FEATURE_DIR: Path
 
     # Parameters from feature extraction!
@@ -76,7 +76,7 @@ def build_model_hyperparams(dataset_cfg: DatasetConfig) -> ModelHyperparameters:
 CONFIGS = {
     "pronostia": DatasetConfig(
         SETUP_Name="pronostia",
-        MODEL_OUTPUT_DIR=Path("output/pronostia"),
+        OUTPUT_DIR=Path("output/scaler/pronostia"),
         TRAIN_RAW_DATA_DIR=Path("../../Datasets/Bearings/Pronostia/Dataset/Learning_set/"),
         TEST_RAW_DATA_DIR=Path("../../Datasets/Bearings/Pronostia/Dataset/Full_Test_Set/"),
         PICKLE_TRAIN_DIR=Path("data/raw_pickles/pronostia/training"),
@@ -95,7 +95,7 @@ CONFIGS = {
     ),
     "XJTU_SY": DatasetConfig(
         SETUP_Name="XJTU_SY",
-        MODEL_OUTPUT_DIR=Path("output/XJTU_SY"),
+        OUTPUT_DIR=Path("output/scaler/XJTU_SY"),
         FEATURE_DIR=Path("data/features/XJTU_SY_mel_features"),
         SampleRate=25600,
         OneSec_Samples=2560,
@@ -111,7 +111,7 @@ CONFIGS = {
     )
 }
 
-# ========= Access function ========= #
+# ========= Class access function ========= #
 def get_config(setup_used: str) -> DatasetConfig:
     cfg = CONFIGS.get(setup_used)
     if cfg is None:
@@ -119,3 +119,26 @@ def get_config(setup_used: str) -> DatasetConfig:
     if cfg.model_hyperparams is None:
         cfg.model_hyperparams = build_model_hyperparams(cfg)
     return cfg
+
+# ========= Parameters update function ========= #
+def update_config(cfg: DatasetConfig,
+                  bearing_used: Optional[str] = None,
+                  channel: Optional[str] = None,
+                  n_channels: Optional[int] = None,
+                  **extra_params):
+    """
+    Update selected fields of DatasetConfig dynamically.
+    """
+    if bearing_used is not None:
+        cfg.bearing_used = bearing_used
+    if channel is not None:
+        cfg.channel = channel
+    if n_channels is not None:
+        cfg.n_channels = n_channels
+
+    # Optionally update anything else dynamically
+    for key, value in extra_params.items():
+        if hasattr(cfg, key):
+            setattr(cfg, key, value)
+        else:
+            raise AttributeError(f"DatasetConfig has no attribute '{key}'")
