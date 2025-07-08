@@ -34,6 +34,8 @@ class DatasetConfig:
     # Data and Features Directories!
     SETUP_Name: str
     OUTPUT_DIR: Path
+    SETUP_RAW_DIRS: list  # list of Path objects to the different folders of each setup!
+    PICKLE_DATA_DIR: Path
     FEATURE_DIR: Path
 
     # Parameters from feature extraction!
@@ -48,12 +50,6 @@ class DatasetConfig:
     bearing_used: str
     channel: str = 'both'   # Which channel of the features to use. ('vertical', 'horizontal' or 'both').
     n_channels: int = 2     # When "both" is use set it 2, else set it to 1.
-
-    # Dataset-specific optional paths
-    TRAIN_RAW_DATA_DIR: Optional[Path] = None
-    TEST_RAW_DATA_DIR: Optional[Path] = None
-    PICKLE_TRAIN_DIR: Optional[Path] = None
-    PICKLE_TEST_DIR: Optional[Path] = None
 
     model_hyperparams: Optional[ModelHyperparameters] = None
     extra_params: Optional[dict] = None
@@ -77,10 +73,10 @@ CONFIGS = {
     "pronostia": DatasetConfig(
         SETUP_Name="pronostia",
         OUTPUT_DIR=Path("output/scaler/pronostia"),
-        TRAIN_RAW_DATA_DIR=Path("../../Datasets/Bearings/Pronostia/Dataset/Learning_set/"),
-        TEST_RAW_DATA_DIR=Path("../../Datasets/Bearings/Pronostia/Dataset/Full_Test_Set/"),
-        PICKLE_TRAIN_DIR=Path("data/raw_pickles/pronostia/training"),
-        PICKLE_TEST_DIR=Path("data/raw_pickles/pronostia/test"),
+        SETUP_RAW_DIRS = [
+            Path("../../Datasets/Bearings/Pronostia/Dataset/Learning_set/"),
+            Path("../../Datasets/Bearings/Pronostia/Dataset/Full_Test_Set/")],
+        PICKLE_DATA_DIR=Path("data/raw_pickles/pronostia"),
         FEATURE_DIR=Path("data/features/pronostia_mel_features"),
         SampleRate=25600,
         frame_length=2560,
@@ -96,13 +92,18 @@ CONFIGS = {
     "XJTU_SY": DatasetConfig(
         SETUP_Name="XJTU_SY",
         OUTPUT_DIR=Path("output/scaler/XJTU_SY"),
+        SETUP_RAW_DIRS=[
+            Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/35Hz12kN/"),
+            Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/37_5Hz11kN/"),
+            Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/40Hz10kN/")],
+        PICKLE_DATA_DIR=Path("data/raw_pickles/XJTU_SY"),
         FEATURE_DIR=Path("data/features/XJTU_SY_mel_features"),
         SampleRate=25600,
         frame_length=32768,
         n_fft = 1024,
         hop_length=512,
         n_mels=256,
-        available_bearings=['Bearing1', 'Bearing2', 'Bearing3', 'Bearing4'],
+        available_bearings=['Bearing1', 'Bearing2', 'Bearing3'],
         bearing_used='Bearing1',
         channel='both',
         n_channels=2,
