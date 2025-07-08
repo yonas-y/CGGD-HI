@@ -1,4 +1,3 @@
-pymongo
 zenml
 pandas
 scikit-learn
@@ -9,3 +8,5 @@ keras
 pathlib
 librosa
 PyWavelets
+fastparquet
+pyarrow
