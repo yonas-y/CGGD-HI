@@ -118,9 +118,9 @@ def import_XJTU_SY_data_to_pickle(data_directory_path, pickle_directory_path):
             raise FileNotFoundError(f"No subdirectories found in folder: {data_dir}")
 
         for subdir in subdirs:
-            output_parquet = pickle_dir / f"{subdir.name}_DF.parquet"
+            output_pickle = pickle_dir / f"{subdir.name}_DF.pkl"
 
-            if output_parquet.exists():
+            if output_pickle.exists():
                 print(f"[✓] Skipping {subdir.name} — already imported!")
                 continue
 
@@ -181,8 +181,9 @@ def import_XJTU_SY_data_to_pickle(data_directory_path, pickle_directory_path):
             final_df.columns = columns
 
             # Save the parquet or pickle inside the output 'pickles' directory
-            final_df.to_parquet(output_parquet, index=False)
-            print(f"Final dataset saved to {output_parquet}")
+            final_df.to_pickle(output_pickle)
+            # final_df.to_parquet(output_parquet, index=False)
+            print(f"Final dataset saved to {output_pickle}")
 
     except FileNotFoundError as e:
         print(e)
