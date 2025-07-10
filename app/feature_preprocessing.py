@@ -71,7 +71,7 @@ class feature_preprocessing:
         self.bearing = bearing_used
         self.channel = channel_used
 
-    def load_mel_features(self) -> List[np.ndarray]:
+    def load_mel_features(self, n_mels) -> List[np.ndarray]:
         """
         Loads the bearing features!
 
@@ -79,8 +79,11 @@ class feature_preprocessing:
         mel_db_feat_list = []
 
         for file in self.feature_dir.iterdir():
-            if self.bearing in file.name:
-                # bearing_name = file.name[:10]
+            if(
+                    file.is_file() and
+                    file.name.startswith(self.bearing) and
+                    file.name.endswith(f"{str(n_mels)}.npy")
+            ):
                 mel_db_feat = np.load(file)
 
                 if self.channel == 'horizontal':
@@ -97,7 +100,7 @@ class feature_preprocessing:
         return mel_db_feat_list
 
 
-    def split_scale_features(self, bearing_feature_list: list) -> Tuple[
+    def split_scale_features(self, bearing_feature_list: list, train_indexes: list, test_indexes: list) -> Tuple[
         List[np.ndarray],   # "X_train"
         List[np.ndarray],   # "X_test"
         List[np.ndarray],   # "X_train_scaled"
@@ -107,9 +110,13 @@ class feature_preprocessing:
         Creates train and test sets using the bearing features dictionary.
         Here we use the first two bearings as a training and the remaining as test sets.
         :param bearing_feature_list: Contains a list of bearing run features.
-        :return:
+        :param train_indexes: A list of the indexes of the training samples.
+        :param test_indexes: A list of the indexes of the test samples.
+        :return: The train and test sets and also their scaled values.
         """
-        train_features, test_features = bearing_feature_list[:2], bearing_feature_list[2:]
+        train_features = [bearing_feature_list[i] for i in train_indexes]
+        test_features = [bearing_feature_list[i] for i in test_indexes]
+
         # Keep track of original lengths
         train_lengths = [arr.shape[0] for arr in train_features]
         test_lengths = [arr.shape[0] for arr in test_features]
