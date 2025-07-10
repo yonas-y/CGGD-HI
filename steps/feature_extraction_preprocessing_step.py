@@ -9,6 +9,8 @@ from app.feature_extraction import feature_extraction
 from app.feature_preprocessing import feature_preprocessing
 from app.feature_preprocessing import features_ene_rul_train
 
+from app.active_config import cfg
+
 logger = logging.getLogger(__name__)
 
 @step(enable_cache=False)
@@ -38,14 +40,17 @@ def feature_preprocessing_step(feature_directory: Path, output_directory: Path,
 
     # Load the features!
     logger.info("Loading mel features...")
-    feature_db_list = feature_preprocess.load_mel_features()
+    feature_db_list = feature_preprocess.load_mel_features(cfg.n_mels)
 
     if not feature_db_list:
         raise ValueError("No features loaded; check your feature directory or config.")
 
     # Split and scale the features!
     logger.info("Splitting and scaling features...")
-    X_train, X_test, X_train_scaled, X_test_scaled = feature_preprocess.split_scale_features(feature_db_list)
+    train_index_list = cfg.bearing_splits[bearing_used]["train_index"]
+    test_index_list = cfg.bearing_splits[bearing_used]["test_index"]
+    X_train, X_test, X_train_scaled, X_test_scaled = feature_preprocess.split_scale_features(
+        feature_db_list, train_index_list, test_index_list)
 
     # Extract the scaled energy, RUL and order of the training samples!
     logger.info("Calculating the feature energy ...")
