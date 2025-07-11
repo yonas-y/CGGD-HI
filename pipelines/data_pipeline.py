@@ -6,12 +6,12 @@ from app.active_config import cfg
 @pipeline
 def data_pipeline():
     # Raw data importing step!
-    import_and_catch_data_step(cfg.TRAIN_RAW_DATA_DIR, cfg.PICKLE_TRAIN_DIR)   # Import the training set!
-    import_and_catch_data_step(cfg.TEST_RAW_DATA_DIR, cfg.PICKLE_TEST_DIR)    # Import the test set!
+    for raw_data_dir in cfg.SETUP_RAW_DIRS:
+        # Import raw data from directories!
+        import_and_catch_data_step(cfg.SETUP_Name, raw_data_dir, cfg.PICKLE_DATA_DIR)
 
     # Feature extraction step!
-    feature_extraction_step(cfg.PICKLE_TRAIN_DIR, cfg.FEATURE_DIR) # Feature extraction for the training set!
-    feature_extraction_step(cfg.PICKLE_TEST_DIR, cfg.FEATURE_DIR) # Feature extraction for the test set!
+    feature_extraction_step(cfg.PICKLE_DATA_DIR, cfg.FEATURE_DIR)
 
     # Feature Preprocessing step!
     X_train_scaled, Ene_RUL_order_train, X_test_scaled = feature_preprocessing_step(
