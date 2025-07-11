@@ -8,7 +8,7 @@ class ConvAE_model_subclass(tf.keras.Model):
                  encoding_neurons=8,
                  reg=1e-3, dropout=0.0,
                  poolsize=2, kernelsize=3, stride=1,
-                 activation=tf.keras.layers.LeakyReLU(negative_slope=0.01), **kwargs):
+                 activation=tf.keras.layers.ReLU(), **kwargs):
 
         super(ConvAE_model_subclass, self).__init__(**kwargs)
 
