@@ -121,6 +121,10 @@ class ConvAE_model_subclass(tf.keras.Model):
 
         return HI_out, latent, ae_out
 
+    def build(self, input_shape):
+        # Create weights manually if needed or just call super().build()
+        super().build(input_shape)
+
     def model(self):
         """
         Builds a functional Keras Model for visualization or summary.
