@@ -6,7 +6,7 @@ from app.active_config import cfg
 @pipeline
 def training_pipeline():
     # Model development step!
-    model_development_step()
+    convAE_model = model_development_step()
 
     # # Model training step!
     # feature_extraction_step(cfg.PICKLE_DATA_DIR, cfg.FEATURE_DIR)

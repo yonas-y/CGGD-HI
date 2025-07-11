@@ -1,19 +1,21 @@
 from zenml import step
 import tensorflow as tf
-import logging
-import numpy as np
-from typing import List, Tuple
-
+from typing import List, Tuple, Annotated
 from app.model_development import ConvAE_model_subclass
-
+from app.materializers.convae_materializer import ConvAEMaterializer
 from app.active_config import cfg
+import logging
 
 logger = logging.getLogger(__name__)
 
-@step(enable_cache=False)
-def model_development_step() -> None:
+@step(enable_cache=False, output_materializers=ConvAEMaterializer)
+def model_development_step() -> ConvAE_model_subclass:
     """
-    Step to extract features from the input pickle data.
+    ZenML step that builds and returns a convolutional autoencoder model
+    for health indicator (HI) estimation.
+
+    Returns:
+        A compiled tf.keras.Model instance.
     """
     input_sh = cfg.model_hyperparams.input_sample_shape
     encod_n = cfg.model_hyperparams.encoding_n
@@ -32,4 +34,5 @@ def model_development_step() -> None:
                                            activation=activation)
     functional_model = model_instance.model()
     functional_model.summary()
-    return
+
+    return model_instance
