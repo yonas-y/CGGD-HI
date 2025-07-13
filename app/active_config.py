@@ -29,3 +29,11 @@ cfg.segment_percentages_in_batch = [0.2, 0.7, 0.1]
 # Change the batch size and the amount of validation data reserved!
 cfg.batch_size = 64
 cfg.validation_split = 0.2
+
+# ======== Update the rescale factors of the constraints ========= #
+cfg.constraint_params.soft_rank_rf = 1.0
+cfg.constraint_params.monotonicity_rf = (1.25, 1.5)
+cfg.constraint_params.energy_hi_dev_rf=1.5
+cfg.constraint_params.upper_bound_rf=2.0
+cfg.constraint_params.lower_bound_rf=2.0
+

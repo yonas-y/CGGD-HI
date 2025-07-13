@@ -7,7 +7,7 @@ Contains:
 """
 
 from dataclasses import dataclass
-from typing import List, Tuple, Dict, Optional
+from typing import List, Dict, Optional
 from pathlib import Path
 import tensorflow as tf
 import random
@@ -25,6 +25,29 @@ class ModelHyperparameters:
     activation_function: tf.keras.layers.Layer
     kernel_init: tf.keras.initializers.Initializer
     bias_init: tf.keras.initializers.Initializer
+
+# =========== Constraint Parameters ============== #
+@dataclass
+class ConstraintParameters:
+    """
+    Configuration for constraint hyperparameters used in the model.
+    """
+    # Rescale factors (rf) for different constraints
+    reconstruction_rf: float
+    soft_rank_rf: float
+    monotonicity_rf: tuple
+    energy_hi_dev_rf: float
+    upper_bound_rf: float
+    lower_bound_rf: float
+
+    # Bounds for the two extreme health indicator cases
+    max_cutoff: float
+    upper_cutoff: float
+    lower_cutoff: float
+    min_cutoff: float
+
+    # Regularization factor for Spearman's rank correlation
+    spearmans_regularization: float
 
 # ========= Dataset configuration ========= #
 @dataclass
@@ -62,6 +85,7 @@ class DatasetConfig:
         return 2 if self.channel == 'both' else 1
 
     model_hyperparams: Optional[ModelHyperparameters] = None
+    constraint_params: Optional[ConstraintParameters] = None
     extra_params: Optional[dict] = None
 
 # ========= Function to build model hyperparameters from dataset config ========= #
@@ -78,6 +102,23 @@ def build_model_hyperparams(dataset_cfg: DatasetConfig) -> ModelHyperparameters:
         kernel_init=tf.keras.initializers.GlorotNormal(seed=random.randint(0, 1e6)),
         bias_init=tf.keras.initializers.GlorotNormal(seed=random.randint(0, 1e6))
 
+    )
+
+# ========= Function to build constraint parameters from dataset config ========= #
+def build_constraint_params() -> ConstraintParameters:
+    # You could use dataset_cfg to adjust params if needed, or set static defaults
+    return ConstraintParameters(
+        reconstruction_rf=1.0,
+        soft_rank_rf=1.0,
+        monotonicity_rf=(1.25, 1.5),
+        energy_hi_dev_rf=1.5,
+        upper_bound_rf=2.0,
+        lower_bound_rf=2.0,
+        max_cutoff=1.0,
+        upper_cutoff=0.9,
+        lower_cutoff=0.1,
+        min_cutoff=0.0,
+        spearmans_regularization=0.1
     )
 
 # ========= Dataset configurations ========= #
@@ -109,7 +150,9 @@ CONFIGS = {
         batch_size= 64,
         validation_split= 0.2,
 
-        model_hyperparams=None
+        model_hyperparams=None,
+        constraint_params=None,
+        extra_params= None
     ),
 
     "XJTU_SY": DatasetConfig(
@@ -141,6 +184,7 @@ CONFIGS = {
         validation_split=0.2,
 
         model_hyperparams=None,
+        constraint_params=None,
         extra_params= None
     )
 }
@@ -152,6 +196,8 @@ def get_config(setup_used: str) -> DatasetConfig:
         raise ValueError(f"Unknown SETUP: '{setup_used}'. Available: {list(CONFIGS.keys())}")
     if cfg.model_hyperparams is None:
         cfg.model_hyperparams = build_model_hyperparams(cfg)
+    if cfg.constraint_params is None:
+        cfg.constraint_params = build_constraint_params()
     return cfg
 
 # ========= Parameters update function ========= #
