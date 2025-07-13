@@ -26,6 +26,21 @@ class ModelHyperparameters:
     kernel_init: tf.keras.initializers.Initializer
     bias_init: tf.keras.initializers.Initializer
 
+# ========= Model training parameters ========= #
+@dataclass
+class ModelTrainingParameters:
+    # Parameters for run feature partitioning!
+    run_partitioning_portion: tuple
+    segment_percentages_in_batch: tuple
+
+    batch_size: int
+    validation_split: float
+    epochs: int
+    patience: int
+    training_iterations: int
+    save_weights: bool
+    early_stop: bool
+
 # =========== Constraint Parameters ============== #
 @dataclass
 class ConstraintParameters:
@@ -74,18 +89,13 @@ class DatasetConfig:
     bearing_used: str
     channel: str    # Which channel of the features to use. ('vertical', 'horizontal' or 'both').
 
-    # Parameters for run feature partitioning!
-    run_partitioning_portion: List[float]
-    segment_percentages_in_batch: List[float]
-    batch_size: int
-    validation_split: float
-
     @property
     def n_channels(self):
         return 2 if self.channel == 'both' else 1
 
     model_hyperparams: Optional[ModelHyperparameters] = None
     constraint_params: Optional[ConstraintParameters] = None
+    model_training_params: Optional[ModelTrainingParameters] = None
     extra_params: Optional[dict] = None
 
 # ========= Function to build model hyperparameters from dataset config ========= #
@@ -104,9 +114,25 @@ def build_model_hyperparams(dataset_cfg: DatasetConfig) -> ModelHyperparameters:
 
     )
 
+# ========= Function to build model training parameters ========= #
+def build_model_training_params() -> ModelTrainingParameters:
+    # Use dataset_cfg to adjust params if needed, or set static defaults
+    return ModelTrainingParameters(
+        run_partitioning_portion=(0.1, 0.85, 0.05),
+        segment_percentages_in_batch=(0.2, 0.7, 0.1),
+
+        batch_size=64,
+        validation_split=0.2,
+        epochs=100,
+        patience=15,
+        training_iterations=10,
+        save_weights=False,
+        early_stop=False
+    )
+
 # ========= Function to build constraint parameters from dataset config ========= #
 def build_constraint_params() -> ConstraintParameters:
-    # You could use dataset_cfg to adjust params if needed, or set static defaults
+    # Use dataset_cfg to adjust params if needed, or set static defaults
     return ConstraintParameters(
         reconstruction_rf=1.0,
         soft_rank_rf=1.0,
@@ -133,7 +159,7 @@ CONFIGS = {
         FEATURE_DIR=Path("data/features/pronostia_mel_features"),
         SampleRate=25600,
         frame_length=2560,
-        n_fft = 1024,
+        n_fft=1024,
         hop_length=512,
         n_mels=128,
         bearing_used='Bearing1',
@@ -145,14 +171,10 @@ CONFIGS = {
                 "Bearing3": {"train_index": [0, 1], "test_index": [2]}
         },
 
-        run_partitioning_portion = [0.1, 0.85, 0.05],
-        segment_percentages_in_batch = [0.2, 0.7, 0.1],
-        batch_size= 64,
-        validation_split= 0.2,
-
         model_hyperparams=None,
         constraint_params=None,
-        extra_params= None
+        model_training_params=None,
+        extra_params=None
     ),
 
     "XJTU_SY": DatasetConfig(
@@ -166,7 +188,7 @@ CONFIGS = {
         FEATURE_DIR=Path("data/features/XJTU_SY_mel_features"),
         SampleRate=25600,
         frame_length=32768,
-        n_fft = 1024,
+        n_fft=1024,
         hop_length=512,
         n_mels=128,
         bearing_used='Bearing1',
@@ -178,14 +200,10 @@ CONFIGS = {
                 "Bearing3": {"train_index": [1, 2], "test_index": [0, 3, 4]}
         },
 
-        run_partitioning_portion = [0.1, 0.85, 0.05],
-        segment_percentages_in_batch = [0.2, 0.7, 0.1],
-        batch_size=64,
-        validation_split=0.2,
-
         model_hyperparams=None,
         constraint_params=None,
-        extra_params= None
+        model_training_params=None,
+        extra_params=None
     )
 }
 
@@ -196,6 +214,8 @@ def get_config(setup_used: str) -> DatasetConfig:
         raise ValueError(f"Unknown SETUP: '{setup_used}'. Available: {list(CONFIGS.keys())}")
     if cfg.model_hyperparams is None:
         cfg.model_hyperparams = build_model_hyperparams(cfg)
+    if cfg.model_training_params is None:
+        cfg.model_training_params = build_model_training_params()
     if cfg.constraint_params is None:
         cfg.constraint_params = build_constraint_params()
     return cfg
