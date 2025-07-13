@@ -104,3 +104,70 @@ def compute_dir_prediction_mel_energy(predictions, sample_energy, energy_range, 
     # dir_wrong_predict_energy_norm = tf.math.l2_normalize(dir_wrong_predict_energy_norm)
 
     return dir_wrong_predict_energy, energy_deviation_satisfaction
+
+def check_upper_bound(predictions, upper_bounds):
+    """
+     Check if predictions satisfies upper bound constraint.
+
+     Parameters
+     ----------
+     predictions : tf.Tensor
+     upper_bounds : tf.Tensor
+         A tf.Tensor indicating the upper bounds for the predictions. These values can be random if the prediction
+         does not have a upper bound constraint as indicated by a 0 in the corresponding upper_bounds_indicator.
+         This supports broadcasting, meaning that a tf.Tensor of shape=(1, predictions.shape[1]) defines for
+         each element in the batch a upper bound.
+
+     Returns
+     ----------
+     sat_con : tf.Tensor
+         A tf.Tensor of Boolean values indicating which predictions satisfy the constraints.
+     count_total_con_sat : tf.Tensor
+         A tf.Tensor of shape=(,) with the total number of constraints being satisfied.
+     """
+
+    count_total_con = predictions.shape[0]
+    sat_con = tf.math.less_equal(predictions, tf.cast(upper_bounds, dtype=tf.float32))
+    count_total_con_sat = tf.math.reduce_sum(tf.cast(sat_con, tf.float32))
+    percentage_con_sat = tf.math.divide_no_nan(count_total_con_sat, count_total_con)
+    sat_con = tf.where(sat_con, tf.constant(0, dtype=tf.float32), tf.constant(1, dtype=tf.float32))
+    # sat_cons_diff = tf.math.abs(tf.math.subtract(tf.cast(upper_bounds, dtype=tf.float32),
+    #                                  tf.cast(predictions, dtype=tf.float32)))
+    # sat_cons_diff = tf.math.multiply(sat_con, sat_cons_diff)
+    # sat_cons_diff = tf.math.l2_normalize(sat_cons_diff)
+
+    return sat_con, percentage_con_sat
+
+
+def check_lower_bound(predictions, lower_bounds):
+    """
+     Check if predictions satisfies a lower bound constraint.
+
+     Parameters
+     ----------
+     predictions : tf.Tensor
+     lower_bounds : tf.Tensor
+         A tf.Tensor indicating the lower bounds for the predictions. These values can be random if the prediction
+         does not have a lower bound constraint as indicated by a 0 in the corresponding lower_bounds_indicator.
+         This supports broadcasting, meaning that a tf.Tensor of shape=(1, predictions.shape[1]) defines for each
+         element in the batch a lower bound.
+
+     Returns
+     ----------
+     sat_con : tf.Tensor
+         A tf.Tensor of Boolean values indicating which predictions satisfy the constraints.
+     count_total_con_sat : tf.Tensor
+         A tf.Tensor of shape=(,) with the total number of constraints being satisfied.
+     """
+
+    count_total_con = predictions.shape[0]
+    sat_con = tf.math.greater_equal(predictions, tf.cast(lower_bounds, dtype=tf.float32))
+    count_total_con_sat = tf.math.reduce_sum(tf.cast(sat_con, tf.float32))
+    percentage_con_sat = tf.math.divide_no_nan(count_total_con_sat, count_total_con)
+    sat_con = tf.where(sat_con, tf.constant(0, dtype=tf.float32), tf.constant(-1, dtype=tf.float32))
+    # sat_cons_diff = tf.math.abs(tf.math.subtract(tf.cast(lower_bounds, dtype=tf.float32),
+    #                                  tf.cast(predictions, dtype=tf.float32)))
+    # sat_cons_diff = tf.math.multiply(sat_con, sat_cons_diff)
+    # sat_cons_diff = tf.math.l2_normalize(sat_cons_diff)
+
+    return sat_con, percentage_con_sat
