@@ -127,3 +127,68 @@ def shuffle_batched_interleaved(percentage_partitioned_data: List[List[np.ndarra
     train_data, val_data = final_batched_datasets[:split_index], final_batched_datasets[split_index:]
 
     return train_data, val_data
+
+
+def bound_indicators(y_data,
+                     max_up_bnd=1.0,
+                     upper_cutoff=0.9,
+                     min_lwr_bnd=0,
+                     lower_cutoff=0.1
+                     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Compute bound indicators and bounding values for input RUL (Remaining Useful Life) data.
+
+    Given an array of RUL values, this function checks which values exceed the upper or lower cutoffs
+    and constructs indicators and corresponding upper and lower bounds based on these cutoffs.
+
+    Parameters
+    ----------
+    y_data : Input array of RUL values.
+    max_up_bnd : Maximum upper bound value to assign when data is within acceptable range. Default is 1.0.
+    upper_cutoff : Upper cutoff threshold; values above this will trigger an upper saturation indicator. Default is 0.9.
+    min_lwr_bnd : Minimum lower bound value to assign when data is within acceptable range. Default is 0.
+    lower_cutoff : Lower cutoff threshold; values below this will trigger a lower saturation indicator. Default is 0.1.
+
+    Returns
+    -------
+    bnd_sat_ind : np.ndarray of shape (n_samples, 1)
+        Indicator array showing whether each value is outside the cutoff bounds.
+    upper_bnd : np.ndarray of shape (n_samples, 1)
+        Computed upper bounds for each input value.
+    lower_bnd : np.ndarray of shape (n_samples, 1)
+        Computed lower bounds for each input value.
+    """
+
+    # Convert inputs to float arrays if needed
+    y_data = np.asarray(y_data, dtype=np.float32)
+    n = len(y_data)
+
+    if np.max(y_data) >= upper_cutoff or np.min(y_data) <= lower_cutoff:
+        bnd_sat_ind_up = np.where(y_data >= upper_cutoff, 1.0, 0.0)
+        bnd_sat_ind_lw = np.where(y_data <= lower_cutoff, 1.0, 0.0)
+
+        bnd_sat_ind = bnd_sat_ind_up + bnd_sat_ind_lw
+
+        # upper_bnd_up: if bnd_sat_ind_lw == 0 → 1 else 0, then * max_up_bnd
+        mask = np.where(bnd_sat_ind_lw == 0.0, 1.0, 0.0)
+        upper_bnd_up = mask * max_up_bnd
+
+        upper_bnd_lw = bnd_sat_ind_up * upper_cutoff
+        lower_bnd_up = bnd_sat_ind_lw * lower_cutoff
+
+        mask = np.where(bnd_sat_ind_up == 0.0, 1.0, 0.0)
+        lower_bnd_lw = mask * min_lwr_bnd
+
+        upper_bnd = upper_bnd_up + lower_bnd_up
+        lower_bnd = upper_bnd_lw + lower_bnd_lw
+    else:
+        bnd_sat_ind = np.zeros(n, dtype=np.float32)
+        upper_bnd = np.ones(n, dtype=np.float32)
+        lower_bnd = np.zeros(n, dtype=np.float32)
+
+    # Reshape to column vectors (n, 1)
+    return (
+        bnd_sat_ind.reshape(-1, 1),
+        upper_bnd.reshape(-1, 1),
+        lower_bnd.reshape(-1, 1)
+    )
