@@ -7,7 +7,7 @@ Contains:
 """
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Tuple, Dict, Optional
 from pathlib import Path
 import tensorflow as tf
 import random
@@ -21,9 +21,10 @@ class ModelHyperparameters:
     dropout_rate: float
     pooling_size: int
     kernel_size_conv: int
-    stride_convolutional: int
+    stride_conv: int
     activation_function: tf.keras.layers.Layer
     kernel_init: tf.keras.initializers.Initializer
+    bias_init: tf.keras.initializers.Initializer
 
 # ========= Dataset configuration ========= #
 @dataclass
@@ -46,10 +47,19 @@ class DatasetConfig:
     n_mels: int                # number of Mel bands to generate.
 
     # Parameters for feature preprocessing!
-    available_bearings: List[str]  # On which bearing to work on.
+    bearing_splits: Dict[str, Dict[str, List[str]]] #  train/test split info
     bearing_used: str
-    channel: str = 'both'   # Which channel of the features to use. ('vertical', 'horizontal' or 'both').
-    n_channels: int = 2     # When "both" is use set it 2, else set it to 1.
+    channel: str    # Which channel of the features to use. ('vertical', 'horizontal' or 'both').
+
+    # Parameters for run feature partitioning!
+    run_partitioning_portion: List[float]
+    segment_percentages_in_batch: List[float]
+    batch_size: int
+    validation_split: float
+
+    @property
+    def n_channels(self):
+        return 2 if self.channel == 'both' else 1
 
     model_hyperparams: Optional[ModelHyperparameters] = None
     extra_params: Optional[dict] = None
@@ -63,9 +73,11 @@ def build_model_hyperparams(dataset_cfg: DatasetConfig) -> ModelHyperparameters:
         dropout_rate=0.0,
         pooling_size=2,
         kernel_size_conv=3,
-        stride_convolutional=2,
+        stride_conv=1,
         activation_function=tf.keras.layers.ReLU(),
-        kernel_init=tf.keras.initializers.GlorotNormal(seed=random.randint(0, 1e6))
+        kernel_init=tf.keras.initializers.GlorotNormal(seed=random.randint(0, 1e6)),
+        bias_init=tf.keras.initializers.GlorotNormal(seed=random.randint(0, 1e6))
+
     )
 
 # ========= Dataset configurations ========= #
@@ -76,19 +88,30 @@ CONFIGS = {
         SETUP_RAW_DIRS = [
             Path("../../Datasets/Bearings/Pronostia/Dataset/Learning_set/"),
             Path("../../Datasets/Bearings/Pronostia/Dataset/Full_Test_Set/")],
-        PICKLE_DATA_DIR=Path("data/raw_pickles/pronostia"),
+        PICKLE_DATA_DIR=Path("../../Datasets/Bearings/raw_pickles/pronostia"),
         FEATURE_DIR=Path("data/features/pronostia_mel_features"),
         SampleRate=25600,
         frame_length=2560,
         n_fft = 1024,
         hop_length=512,
-        n_mels=256,
-        available_bearings=['Bearing1', 'Bearing2', 'Bearing3'],
+        n_mels=128,
         bearing_used='Bearing1',
         channel='both',
-        n_channels=2,
-        model_hyperparams=None,
+
+        bearing_splits={   # NEW Providing the indexes!
+                "Bearing1": {"train_index": [0, 1], "test_index": [2, 3, 4, 5, 6]},
+                "Bearing2": {"train_index": [0, 1], "test_index": [2, 3, 4, 5, 6]},
+                "Bearing3": {"train_index": [0, 1], "test_index": [2]}
+        },
+
+        run_partitioning_portion = [0.1, 0.85, 0.05],
+        segment_percentages_in_batch = [0.2, 0.7, 0.1],
+        batch_size= 64,
+        validation_split= 0.2,
+
+        model_hyperparams=None
     ),
+
     "XJTU_SY": DatasetConfig(
         SETUP_Name="XJTU_SY",
         OUTPUT_DIR=Path("output/scaler/XJTU_SY"),
@@ -96,17 +119,27 @@ CONFIGS = {
             Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/35Hz12kN/"),
             Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/37_5Hz11kN/"),
             Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/40Hz10kN/")],
-        PICKLE_DATA_DIR=Path("data/raw_pickles/XJTU_SY"),
+        PICKLE_DATA_DIR=Path("../../Datasets/Bearings/raw_pickles/XJTU_SY"),
         FEATURE_DIR=Path("data/features/XJTU_SY_mel_features"),
         SampleRate=25600,
         frame_length=32768,
         n_fft = 1024,
         hop_length=512,
-        n_mels=256,
-        available_bearings=['Bearing1', 'Bearing2', 'Bearing3'],
+        n_mels=128,
         bearing_used='Bearing1',
         channel='both',
-        n_channels=2,
+
+        bearing_splits={   # NEW Providing the indexes!
+                "Bearing1": {"train_index": [1, 3], "test_index": [0, 2, 4]},
+                "Bearing2": {"train_index": [0, 1], "test_index": [2, 3, 4]},
+                "Bearing3": {"train_index": [1, 2], "test_index": [0, 3, 4]}
+        },
+
+        run_partitioning_portion = [0.1, 0.85, 0.05],
+        segment_percentages_in_batch = [0.2, 0.7, 0.1],
+        batch_size=64,
+        validation_split=0.2,
+
         model_hyperparams=None,
         extra_params= None
     )
@@ -125,7 +158,6 @@ def get_config(setup_used: str) -> DatasetConfig:
 def update_config(cfg: DatasetConfig,
                   bearing_used: Optional[str] = None,
                   channel: Optional[str] = None,
-                  n_channels: Optional[int] = None,
                   **extra_params):
     """
     Update selected fields of DatasetConfig dynamically.
@@ -134,8 +166,6 @@ def update_config(cfg: DatasetConfig,
         cfg.bearing_used = bearing_used
     if channel is not None:
         cfg.channel = channel
-    if n_channels is not None:
-        cfg.n_channels = n_channels
 
     # Optionally update anything else dynamically
     for key, value in extra_params.items():
