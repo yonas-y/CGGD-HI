@@ -6,8 +6,8 @@ from typing import List, Tuple
 from pathlib import Path
 
 from app.feature_extraction import feature_extraction
-from app.feature_preprocessing import feature_preprocessing
-from app.feature_preprocessing import features_ene_rul_train
+from app.feature_preprocessing import feature_preprocessing, features_ene_rul_train
+from app.feature_partitioning import create_feature_portions, shuffle_batched_interleaved
 
 from app.active_config import cfg
 
@@ -58,3 +58,23 @@ def feature_preprocessing_step(feature_directory: Path, output_directory: Path,
 
     logger.info("Feature preprocessing completed successfully.")
     return X_train_scaled, Ene_RUL_order_train, X_test_scaled
+
+@step(enable_cache=False)
+def feature_partitioning_step(feature_mel: List[np.ndarray],
+                              feature_ene_rul_order: List[np.ndarray],
+                              percentages: List[float]) -> List[List[np.ndarray]]:
+    # Partitions the features into start, mid and final sections segments of the run!
+    X_train_lists = create_feature_portions(feature_mel, feature_ene_rul_order, percentages)
+
+    return X_train_lists
+
+@step(enable_cache=False)
+def train_validation_split_step(percentage_partitioned_data: List[List[np.ndarray]],
+    batch_percentages: List[float], val_split: float, batch_size: int)-> Tuple[List, List]:
+
+    # Shuffles and partitions the data into training and validation sets!
+    training_data, validation_data = shuffle_batched_interleaved(percentage_partitioned_data,
+                                                                 batch_percentages,
+                                                                 val_split, batch_size)
+
+    return training_data, validation_data

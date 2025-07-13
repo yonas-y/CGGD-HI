@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="yonas@barabas.cs.kuleuven.be:22 password (17)" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="yonas@barabas.cs.kuleuven.be:22 password">
         <serverdata>
@@ -61,7 +61,7 @@
       <paths name="yonas@barabas.cs.kuleuven.be:22 password (17)">
         <serverdata>
           <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="CGGD_HI" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
@@ -122,5 +122,6 @@
         </serverdata>
       </paths>
     </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>
