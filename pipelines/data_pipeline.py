@@ -20,7 +20,7 @@ def data_pipeline():
                             feature_dir = cfg.FEATURE_DIR)
 
     # Feature Preprocessing step!
-    X_train_scaled, Ene_RUL_order_train, X_test_scaled = feature_preprocessing_step(
+    X_train_scaled, Ene_RUL_order_train, run_energy_minmax, X_test_scaled = feature_preprocessing_step(
         feature_directory=cfg.FEATURE_DIR,
         output_directory=cfg.OUTPUT_DIR,
         bearing_used=cfg.bearing_used,
@@ -40,4 +40,4 @@ def data_pipeline():
         val_split=cfg.validation_split,
         batch_size=cfg.batch_size )
 
-    return training_scaled_data, validation_scaled_data, test_scaled_data
+    return training_scaled_data, validation_scaled_data, run_energy_minmax, test_scaled_data
