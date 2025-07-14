@@ -2,7 +2,7 @@ import tensorflow as tf
 import keras
 import numpy as np
 from app.active_config import cfg
-from app.metrics import custom_spearman_corr_loss_numpy
+from app.metrics import custom_differentiable_spearman_corr_loss
 from app.constraints import (compute_dir_monotonicity_custom_ordering,
                              compute_dir_prediction_mel_energy,
                              check_upper_bound, check_lower_bound)
@@ -16,7 +16,6 @@ class CustomModelMain(keras.Model):
 
     Attributes:
         model (keras.Model): The core neural network architecture.
-        model_arch (str): Identifier of the architecture type.
         rs_factor_recon (float): Rescale factor for reconstruction loss.
         rs_factor_softrank (float): Rescale factor for SoftRank loss.
         rs_factor_mono_lower (float): Rescale factor for lower monotonicity constraint.
@@ -38,10 +37,9 @@ class CustomModelMain(keras.Model):
         Extend it in a subclass to customize training, add extra constraints, or override methods.
     """
 
-    def __init__(self, model: keras.Model, model_arch: str):
+    def __init__(self, model: keras.Model):
         super().__init__()
         self.model = model
-        self.model_arch = model_arch
 
         # Load constraint hyperparameters dynamically from config
         params = cfg.constraint_params
@@ -87,8 +85,8 @@ class CustomModel(CustomModelMain):
     for future extensions.
     """
 
-    def __init__(self, model: keras.Model, model_arch: str):
-        super().__init__(model=model, model_arch=model_arch)
+    def __init__(self, model: keras.Model):
+        super().__init__(model=model)
 
     def custom_train_step_ConvAE(self, train_mel_feat, train_y, order_train, energy_train, energy_range, run_train):
         """
