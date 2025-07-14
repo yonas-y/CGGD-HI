@@ -1,16 +1,21 @@
 from zenml import pipeline
-from steps.training_steps import model_development_step
+from pipelines.data_pipeline import data_pipeline
 
-from app.active_config import cfg
+from steps.training_step import model_execution_step
+from steps.save_metrics_step import save_metrics_step
 
 @pipeline
-def training_pipeline():
-    # Model development step!
-    convAE_model = model_development_step()
+def training_pipeline(model, iter_n: int = 0):
+    # Get data from data_pipeline
+    training_data, validation_data, _ = data_pipeline()
 
-    # # Model training step!
-    # feature_extraction_step(cfg.PICKLE_DATA_DIR, cfg.FEATURE_DIR)
+    # Model execution step!
+    perf_df = model_execution_step(
+        model=model,
+        training_data=training_data,
+        validation_data=validation_data,
+        iteration_n=iter_n
+    )
 
-
-
-    return
+    # Save the model performance!
+    save_metrics_step(performance_df=perf_df, iteration_n=iter_n)
