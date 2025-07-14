@@ -1,6 +1,4 @@
 from zenml import step
-import os
-import logging
 import numpy as np
 from typing import List, Tuple, Annotated
 from pathlib import Path
@@ -12,6 +10,7 @@ from app.feature_partitioning import create_feature_portions, shuffle_batched_in
 
 from app.active_config import cfg
 
+import logging
 logger = logging.getLogger(__name__)
 
 @step(enable_cache=False)
