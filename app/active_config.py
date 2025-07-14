@@ -43,4 +43,3 @@ cfg.constraint_params.monotonicity_rf = (1.25, 1.5)
 cfg.constraint_params.energy_hi_dev_rf=1.5
 cfg.constraint_params.upper_bound_rf=2.0
 cfg.constraint_params.lower_bound_rf=2.0
-
