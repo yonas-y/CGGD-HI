@@ -61,6 +61,10 @@ class ConstraintParameters:
     lower_cutoff: float
     min_cutoff: float
 
+    # Bounds for the normalized energy!
+    min_scaled_energy: float
+    max_scaled_energy: float
+
     # Regularization factor for Spearman's rank correlation
     spearmans_regularization: float
 
@@ -144,7 +148,9 @@ def build_constraint_params() -> ConstraintParameters:
         upper_cutoff=0.9,
         lower_cutoff=0.1,
         min_cutoff=0.0,
-        spearmans_regularization=0.1
+        spearmans_regularization=0.1,
+        min_scaled_energy= 0.0,
+        max_scaled_energy=1.0
     )
 
 # ========= Dataset configurations ========= #
