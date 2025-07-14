@@ -2,7 +2,7 @@ from zenml import step
 import os
 import logging
 import numpy as np
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from pathlib import Path
 
 from app.feature_extraction import feature_extraction
@@ -26,13 +26,16 @@ def feature_extraction_step(pickle_dir: Path, feature_dir: Path) -> None:
 @step(enable_cache=False)
 def feature_preprocessing_step(feature_directory: Path, output_directory: Path,
                                bearing_used: str, channel_used: str) -> Tuple[
-    List[np.ndarray],       # X_train_scaled
-    List[np.ndarray],       # Ene_RUL_Order_train
-    List[np.ndarray]        # X_test_scaled
+    List[np.ndarray],
+    List[np.ndarray],
+    Dict,
+    List[np.ndarray]
 ]:
     """
     Load mel features from the feature directory, then split and scale them
     into train/test sets.
+
+    :return X_train_scaled, Ene_RUL_Order_train, run_energy_minmax, X_test_scaled
     """
     # Create the preprocessing class!
     logger.info("Initializing feature preprocessing...")
@@ -54,10 +57,10 @@ def feature_preprocessing_step(feature_directory: Path, output_directory: Path,
 
     # Extract the scaled energy, RUL and order of the training samples!
     logger.info("Calculating the feature energy ...")
-    Ene_RUL_order_train = features_ene_rul_train(X_train)
+    Ene_RUL_order_train, run_energy_minmax = features_ene_rul_train(X_train)
 
     logger.info("Feature preprocessing completed successfully.")
-    return X_train_scaled, Ene_RUL_order_train, X_test_scaled
+    return X_train_scaled, Ene_RUL_order_train, run_energy_minmax, X_test_scaled
 
 @step(enable_cache=False)
 def feature_partitioning_step(feature_mel: List[np.ndarray],
