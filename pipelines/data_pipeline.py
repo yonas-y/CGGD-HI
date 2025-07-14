@@ -1,4 +1,5 @@
 from zenml import pipeline
+from typing import Tuple, List
 from steps.data_import_step import import_and_catch_data_step
 from steps.feature_extraction_preprocessing_step import (feature_extraction_step,
                                                          feature_preprocessing_step,
@@ -7,7 +8,7 @@ from steps.feature_extraction_preprocessing_step import (feature_extraction_step
 from app.active_config import cfg
 
 @pipeline
-def data_pipeline():
+def data_pipeline() -> Tuple[List, List, List]:
     # Raw data importing step!
     for raw_data_dir in cfg.SETUP_RAW_DIRS:
         # Import raw data from directories!
@@ -32,7 +33,6 @@ def data_pipeline():
         feature_partitioning_step(feature_mel=X_train_scaled,
                                   feature_ene_rul_order = Ene_RUL_order_train,
                                   percentages = cfg.model_training_params.run_partitioning_portion))
-
 
     # Split into training and validation sets step!
     training_scaled_data, validation_scaled_data = train_validation_split_step(
