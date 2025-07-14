@@ -23,4 +23,4 @@ def save_metrics_step(performance_df: pd.DataFrame, iteration_n: int):
                f'{iteration_n}.pkl'
 
     performance_df.to_pickle(os.path.join(output_dir, filename))
-    logger.info(f"✅ Saved performance DataFrame as {filename}")
+    logger.info(f"✅  Saved model performance as: {filename}")
