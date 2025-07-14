@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 @step(enable_cache=False)
-def save_metrics_step(df: pd.DataFrame, iter_n: int):
+def save_metrics_step(performance_df: pd.DataFrame, iteration_n: int):
     output_dir = 'output/model_performance'
     os.makedirs(output_dir, exist_ok=True)
     filename = f'performance_df_' \
@@ -20,7 +20,7 @@ def save_metrics_step(df: pd.DataFrame, iter_n: int):
                f'{cfg.constraint_params.energy_hi_dev_rf}_' \
                f'{cfg.constraint_params.upper_bound_rf}_' \
                f'{cfg.constraint_params.lower_bound_rf}_' \
-               f'{iter_n}.pkl'
+               f'{iteration_n}.pkl'
 
-    df.to_pickle(os.path.join(output_dir, filename))
+    performance_df.to_pickle(os.path.join(output_dir, filename))
     logger.info(f"✅ Saved performance DataFrame as {filename}")
