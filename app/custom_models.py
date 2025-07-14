@@ -147,8 +147,8 @@ class CustomModel(CustomModelMain):
                 min_lwr_bnd=self.lw_min_cutoff, lower_cutoff=self.lw_cutoff)
 
             # Compute energy indicator!
-            energy_indicator = tf.where(tf.equal(train_bnd_ind, 0), tf.ones_like(train_bnd_ind),
-                                        tf.zeros_like(train_bnd_ind))
+            energy_indicator = tf.cast(tf.where(tf.equal(train_bnd_ind, 0), tf.ones_like(train_bnd_ind),
+                                        tf.zeros_like(train_bnd_ind)), dtype=tf.float32)
 
             with tape.stop_recording():
                 recon_loss_grad_latent = tape.gradient(total_init_loss, encoding_out,
@@ -268,8 +268,8 @@ class CustomModel(CustomModelMain):
             val_y, max_up_bnd=self.up_max_cutoff, upper_cutoff=self.up_cutoff,
             min_lwr_bnd=self.lw_min_cutoff, lower_cutoff=self.lw_cutoff)
 
-        energy_indicator_val = tf.where(tf.equal(val_bnd_ind, 0), tf.ones_like(val_bnd_ind),
-                                        tf.zeros_like(val_bnd_ind))
+        energy_indicator_val = tf.cast(tf.where(tf.equal(val_bnd_ind, 0), tf.ones_like(val_bnd_ind),
+                                        tf.zeros_like(val_bnd_ind)), dtype=tf.float32)
 
         # Helper function for conditional constraint computations
         def compute_constraints_satisfaction(condition, func, *args):
