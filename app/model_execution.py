@@ -55,7 +55,7 @@ def model_execution(model,
                 f'{upper_rescale}_{lower_rescale}_{iteration}_recon_val.weights.h5'
             )
             model.save_weights(filename)
-            logger.info(f"☁️ Model weights!")
+            logger.info(f"☁️ Saved the model weight!")
             best_val = loss_value
             wait_val = 0
         else:
@@ -212,7 +212,7 @@ def model_execution(model,
                 logger.info("⚠️ Early Stopping! ⚠️ No more performance improvement!")
                 break
 
-        logger.info(f"✅ ETA: {round((time.time() - t) / 60, 2)} - epoch: {epoch + 1} "
+        logger.info(f"🔄 ETA: {round((time.time() - t) / 60, 2)} - epoch: {epoch + 1} "
               f"train_recon_loss: {train_mean_metrics['train_recon_loss_l']} "
               f"train_soft_rank_loss: {train_mean_metrics['train_soft_rank_loss_l']} "
               f"train_mono_correlation: {train_mean_metrics['train_mono_correlation_l']} "
