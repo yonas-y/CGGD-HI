@@ -7,13 +7,15 @@ from sklearn.metrics import mutual_info_score
 from sklearn.preprocessing import KBinsDiscretizer
 
 
-def custom_differentiable_spearman_corr_loss(y_pred, y_true):
+def custom_differentiable_spearman_corr_loss(y_pred, y_true, regularization="l2", regularization_strength=1.0):
     """
     Computes the Spearman's rank correlation coefficient using NumPy.
 
     Args:
         y_true (np.ndarray): Ground truth values, shape (N,) or (batch, N).
         y_pred (np.ndarray): Predicted values, shape (N,) or (batch, N).
+        regularization:
+        regularization_strength:
 
     Returns:
         np.ndarray: Spearman's rank correlation coefficient for each batch
