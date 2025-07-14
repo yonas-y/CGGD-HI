@@ -84,5 +84,6 @@ output/
 Test_Scripts.ipynb
 /output
 /data
+/saved_model_artifact
 
 app/fast-soft-sort-master/
