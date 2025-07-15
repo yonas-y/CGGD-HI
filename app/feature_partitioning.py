@@ -3,6 +3,8 @@ from typing import List, Tuple
 import numpy as np
 import random
 import time
+import logging
+logger = logging.getLogger(__name__)
 
 def create_feature_portions(train_mel_feature: List[np.ndarray],
                             ene_rul_feat: List[np.ndarray],
@@ -73,7 +75,9 @@ def shuffle_batched_interleaved(percentage_partitioned_data: List[List[np.ndarra
     final_batched_datasets = []
 
     total_nu_samples = sum(len(part) for part in percentage_partitioned_data[0])
-    n_batches = 3 * (total_nu_samples // batch_size)
+    logger.info(f"⭐ Total number of feature samples in the training set is: {total_nu_samples}")
+    n_batches = int(3 * np.ceil(total_nu_samples / batch_size))
+    logger.info(f"📦 Created number of total batches (3 * np.ceil(total_nu_samples / batch_size)): {n_batches}")
 
     for i in range(n_batches):
         random.seed(time.time())
@@ -90,13 +94,13 @@ def shuffle_batched_interleaved(percentage_partitioned_data: List[List[np.ndarra
                 features_portion_shuffled_list.append(features_portion_shuffled)
 
             # Calculate the number of samples from this group in each batch!
-            num_samples_batch = int(batch_size * batch_percentages[j])
-
+            num_samples = min(int(batch_size * batch_percentages[j]), len(features_portion_shuffled_list[0]))
+            max_start = len(features_portion_shuffled_list[0]) - num_samples
             # Extract data from the portions based on the number of samples!
-            start = random.randint(0, len(features_portion_shuffled_list[0]) - num_samples_batch)
-            extracted_elements_to_batch = [sublist[start:start + num_samples_batch] for sublist in
-                                           features_portion_shuffled_list]
-            extracted_elements_to_batch_list.append(extracted_elements_to_batch)
+            start_idx = random.randint(0, max_start) if max_start > 0 else 0
+
+            batch = [lst[start_idx:start_idx + num_samples] for lst in features_portion_shuffled_list]
+            extracted_elements_to_batch_list.append(batch)
 
         # Now concatenate the similar feature portions together to have the full batch size features!
         full_batch_size_element_list = []
@@ -112,7 +116,6 @@ def shuffle_batched_interleaved(percentage_partitioned_data: List[List[np.ndarra
         for sel_full_batch_size_element in full_batch_size_element_list:
             np.random.seed(seed)  # Set the seed for shuffling
             full_batch_size_element_shuffled = np.random.permutation(sel_full_batch_size_element)
-            # full_batch_size_element_shuffled = tf.cast(full_batch_size_element_shuffled, dtype=tf.float32)
             full_batch_size_element_shuffled_list.append(full_batch_size_element_shuffled)
 
         final_batched_datasets.append(full_batch_size_element_shuffled_list)
