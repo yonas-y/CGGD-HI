@@ -139,91 +139,105 @@ def build_constraint_params() -> ConstraintParameters:
     # Use dataset_cfg to adjust params if needed, or set static defaults
     return ConstraintParameters(
         reconstruction_rf=1.0,
-        soft_rank_rf=1.0,
-        monotonicity_rf=(1.25, 1.5),
-        energy_hi_dev_rf=1.5,
-        upper_bound_rf=2.0,
-        lower_bound_rf=2.0,
+        soft_rank_rf=0.0,
+        monotonicity_rf=(0.0, 0.01),
+        energy_hi_dev_rf=0.0,
+        upper_bound_rf=0.0,
+        lower_bound_rf=0.0,
         max_cutoff=1.0,
         upper_cutoff=0.9,
         lower_cutoff=0.1,
         min_cutoff=0.0,
         spearmans_regularization=0.1,
-        min_scaled_energy= 0.0,
-        max_scaled_energy=1.0
+        max_scaled_energy=1.0,
+        min_scaled_energy=0.0
     )
 
-# ========= Dataset configurations ========= #
-CONFIGS = {
-    "pronostia": DatasetConfig(
-        SETUP_Name="pronostia",
-        OUTPUT_DIR=Path("output/scaler/pronostia"),
-        SETUP_RAW_DIRS = [
-            Path("../../Datasets/Bearings/Pronostia/Dataset/Learning_set/"),
-            Path("../../Datasets/Bearings/Pronostia/Dataset/Full_Test_Set/")],
-        PICKLE_DATA_DIR=Path("../../Datasets/Bearings/raw_pickles/pronostia"),
-        FEATURE_DIR=Path("data/features/pronostia_mel_features"),
-        SampleRate=25600,
-        frame_length=2560,
-        n_fft=1024,
-        hop_length=512,
-        n_mels=128,
-        bearing_used='Bearing1',
-        channel='both',
+def get_config(setup_name: str, Local: bool) -> DatasetConfig:
+    if setup_name == "pronostia":
+        if Local:
+            raw_dirs = [
+                Path("../../Datasets/Bearings/Pronostia/Dataset/Learning_set/"),
+                Path("../../Datasets/Bearings/Pronostia/Dataset/Full_Test_Set/")
+            ]
+            pickle_dir = Path("../../Datasets/Bearings/raw_pickles/pronostia/")
+        else:
+            raw_dirs = [
+                Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/2012-PRONOSTIA/Learning_set/"),
+                Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/2012-PRONOSTIA/Full_Test_Set/")
+            ]
+            pickle_dir = Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/yonas/Datasets/Bearings/raw_pickles/pronostia/")
 
-        bearing_splits={   # NEW Providing the indexes!
+        cfg = DatasetConfig(
+            SETUP_Name="pronostia",
+            OUTPUT_DIR=Path("output/pronostia"),
+            SETUP_RAW_DIRS=raw_dirs,
+            PICKLE_DATA_DIR=pickle_dir,
+            FEATURE_DIR=Path("data/features/pronostia_mel_features"),
+            SampleRate=25600,
+            frame_length=2560,
+            n_fft=1024,
+            hop_length=512,
+            n_mels=128,
+            bearing_used='Bearing1',
+            channel='both',
+            bearing_splits={
                 "Bearing1": {"train_index": [0, 1], "test_index": [2, 3, 4, 5, 6]},
                 "Bearing2": {"train_index": [0, 1], "test_index": [2, 3, 4, 5, 6]},
                 "Bearing3": {"train_index": [0, 1], "test_index": [2]}
-        },
+            },
+            model_hyperparams=None,
+            constraint_params=None,
+            model_training_params=None,
+            extra_params=None
+        )
 
-        model_hyperparams=None,
-        constraint_params=None,
-        model_training_params=None,
-        extra_params=None
-    ),
+    elif setup_name == "XJTU_SY":
+        if Local:
+            raw_dirs = [
+                Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/35Hz12kN/"),
+                Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/37_5Hz11kN/"),
+                Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/40Hz10kN/")
+            ]
+            pickle_dir = Path("../../Datasets/Bearings/raw_pickles/XJTU_SY/")
+        else:
+            raw_dirs = [
+                Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/XJTU-SY_Bearing_Datasets/Data/35Hz12kN/"),
+                Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/XJTU-SY_Bearing_Datasets/Data/37_5Hz11kN/"),
+                Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/XJTU-SY_Bearing_Datasets/Data/40Hz10kN/")
+            ]
+            pickle_dir = Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/yonas/Datasets/Bearings/raw_pickles/XJTU_SY/")
 
-    "XJTU_SY": DatasetConfig(
-        SETUP_Name="XJTU_SY",
-        OUTPUT_DIR=Path("output/scaler/XJTU_SY"),
-        SETUP_RAW_DIRS=[
-            Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/35Hz12kN/"),
-            Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/37_5Hz11kN/"),
-            Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/40Hz10kN/")],
-        PICKLE_DATA_DIR=Path("../../Datasets/Bearings/raw_pickles/XJTU_SY"),
-        FEATURE_DIR=Path("data/features/XJTU_SY_mel_features"),
-        SampleRate=25600,
-        frame_length=32768,
-        n_fft=1024,
-        hop_length=512,
-        n_mels=128,
-        bearing_used='Bearing1',
-        channel='both',
-
-        bearing_splits={   # NEW Providing the indexes!
+        cfg = DatasetConfig(
+            SETUP_Name="XJTU_SY",
+            OUTPUT_DIR=Path("output/XJTU_SY"),
+            SETUP_RAW_DIRS=raw_dirs,
+            PICKLE_DATA_DIR=pickle_dir,
+            FEATURE_DIR=Path("data/features/XJTU_SY_mel_features"),
+            SampleRate=25600,
+            frame_length=32768,
+            n_fft=1024,
+            hop_length=512,
+            n_mels=128,
+            bearing_used='Bearing1',
+            channel='both',
+            bearing_splits={
                 "Bearing1": {"train_index": [1, 3], "test_index": [0, 2, 4]},
                 "Bearing2": {"train_index": [0, 1], "test_index": [2, 3, 4]},
                 "Bearing3": {"train_index": [1, 2], "test_index": [0, 3, 4]}
-        },
+            },
+            model_hyperparams=None,
+            constraint_params=None,
+            model_training_params=None,
+            extra_params=None
+        )
+    else:
+        raise ValueError(f"Unknown setup: {setup_name}")
 
-        model_hyperparams=None,
-        constraint_params=None,
-        model_training_params=None,
-        extra_params=None
-    )
-}
+    cfg.model_hyperparams = build_model_hyperparams(cfg)
+    cfg.model_training_params = build_model_training_params()
+    cfg.constraint_params = build_constraint_params()
 
-# ========= Class access function ========= #
-def get_config(setup_used: str) -> DatasetConfig:
-    cfg = CONFIGS.get(setup_used)
-    if cfg is None:
-        raise ValueError(f"Unknown SETUP: '{setup_used}'. Available: {list(CONFIGS.keys())}")
-    if cfg.model_hyperparams is None:
-        cfg.model_hyperparams = build_model_hyperparams(cfg)
-    if cfg.model_training_params is None:
-        cfg.model_training_params = build_model_training_params()
-    if cfg.constraint_params is None:
-        cfg.constraint_params = build_constraint_params()
     return cfg
 
 # ========= Parameters update function ========= #
