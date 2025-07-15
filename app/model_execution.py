@@ -51,7 +51,7 @@ def model_execution(model,
         if improved:
             filename = (
                 f'output/saved_models/Custom_Model_{cfg.model_hyperparams.encoding_n}_{cfg.SETUP_Name}_'
-                f'{recon_rescale}_{softrank_rescale}_{mono_rescale[1]}_{ene_dev_rescale}_'
+                f'{cfg.bearing_used}_{recon_rescale}_{softrank_rescale}_{mono_rescale[1]}_{ene_dev_rescale}_'
                 f'{upper_rescale}_{lower_rescale}_{iteration}_recon_val.weights.h5'
             )
             model.save_weights(filename)
