@@ -12,16 +12,20 @@ def data_pipeline() -> Tuple[List, List, List]:
     # Raw data importing step!
     for raw_data_dir in cfg.SETUP_RAW_DIRS:
         # Import raw data from directories!
-        import_and_catch_data_step(setup_name = cfg.SETUP_Name,
-                                   raw_data_dir = raw_data_dir,
-                                   pickle_dir = cfg.PICKLE_DATA_DIR)
+        imported = import_and_catch_data_step(
+            setup_name = cfg.SETUP_Name,
+            raw_data_dir = raw_data_dir,
+            pickle_dir = cfg.PICKLE_DATA_DIR)
 
     # Feature extraction step!
-    feature_extraction_step(pickle_dir = cfg.PICKLE_DATA_DIR,
-                            feature_dir = cfg.FEATURE_DIR)
+    feature_extracted = feature_extraction_step(
+        dep = imported,
+        pickle_dir = cfg.PICKLE_DATA_DIR,
+        feature_dir = cfg.FEATURE_DIR)
 
     # Feature Preprocessing step!
     X_train_scaled, Ene_RUL_order_train, X_test_scaled = feature_preprocessing_step(
+        dep = feature_extracted,
         feature_directory=cfg.FEATURE_DIR,
         output_directory=cfg.OUTPUT_DIR,
         bearing_used=cfg.bearing_used,
@@ -29,10 +33,10 @@ def data_pipeline() -> Tuple[List, List, List]:
     )
 
     # Partitioning a run into different segments step! (Start, Middle, Last)
-    feature_partitioned_lists = (
-        feature_partitioning_step(feature_mel=X_train_scaled,
-                                  feature_ene_rul_order = Ene_RUL_order_train,
-                                  percentages = cfg.model_training_params.run_partitioning_portion))
+    feature_partitioned_lists = feature_partitioning_step(
+        feature_mel=X_train_scaled,
+        feature_ene_rul_order = Ene_RUL_order_train,
+        percentages = cfg.model_training_params.run_partitioning_portion)
 
     # Split into training and validation sets step!
     training_scaled_data, validation_scaled_data = train_validation_split_step(

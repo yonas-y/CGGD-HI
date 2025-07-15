@@ -6,8 +6,8 @@ from app.data_importing import import_pronostia_data_to_pickle, import_XJTU_SY_d
 
 logger = logging.getLogger(__name__)
 
-@step(enable_cache=True)
-def import_and_catch_data_step(setup_name, raw_data_dir, pickle_dir) -> None:
+@step(enable_cache=False)
+def import_and_catch_data_step(setup_name, raw_data_dir, pickle_dir) -> bool:
     """
     Step to load raw CSVs, combine and save as pickle.
     """
@@ -18,4 +18,4 @@ def import_and_catch_data_step(setup_name, raw_data_dir, pickle_dir) -> None:
         logger.info("📦 Importing XJTU_SY raw data as a pickle file...")
         import_XJTU_SY_data_to_pickle(raw_data_dir, pickle_dir)
 
-    return
+    return True
