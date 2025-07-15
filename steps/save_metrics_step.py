@@ -14,6 +14,7 @@ def save_metrics_step(performance_df: pd.DataFrame, iteration_n: int):
     filename = f'performance_df_' \
                f'{cfg.model_hyperparams.encoding_n}_' \
                f'{cfg.SETUP_Name}_' \
+               f'{cfg.bearing_used}_' \
                f'{cfg.constraint_params.reconstruction_rf}_' \
                f'{cfg.constraint_params.soft_rank_rf}_' \
                f'{cfg.constraint_params.monotonicity_rf[1]}_' \
