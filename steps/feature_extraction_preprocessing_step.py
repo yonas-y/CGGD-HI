@@ -14,14 +14,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 @step(enable_cache=False)
-def feature_extraction_step(pickle_dir: Path, feature_dir: Path) -> None:
+def feature_extraction_step(dep: bool,
+                            pickle_dir: Path,
+                            feature_dir: Path) -> bool:
     """
     Step to extract features from the input pickle data.
     """
     logger.info(f"📦 Extracting features ...")
     feature_extraction(pickle_dir, feature_dir)
 
-    return
+    return True
 
 @step(enable_cache=False,
       output_materializers={
@@ -30,8 +32,11 @@ def feature_extraction_step(pickle_dir: Path, feature_dir: Path) -> None:
           "test_data_scaled": JoblibListMaterializer
       }
       )
-def feature_preprocessing_step(feature_directory: Path, output_directory: Path,
-                               bearing_used: str, channel_used: str) -> Tuple[
+def feature_preprocessing_step(dep: bool,
+                               feature_directory:
+                               Path, output_directory: Path,
+                               bearing_used: str,
+                               channel_used: str) -> Tuple[
     Annotated[List[np.ndarray], "train_data_scaled"],
     Annotated[List[np.ndarray], "train_Ene_RUL_Order"],
     Annotated[List[np.ndarray], "test_data_scaled"]
@@ -73,9 +78,10 @@ def feature_preprocessing_step(feature_directory: Path, output_directory: Path,
           "X_train_lists": JoblibListMaterializer
       }
       )
-def feature_partitioning_step(feature_mel: List[np.ndarray],
-                              feature_ene_rul_order: List[np.ndarray],
-                              percentages: List[float]) -> Annotated[List[List[np.ndarray]], "X_train_lists"]:
+def feature_partitioning_step(
+        feature_mel: List[np.ndarray],
+        feature_ene_rul_order: List[np.ndarray],
+        percentages: List[float]) -> Annotated[List[List[np.ndarray]], "X_train_lists"]:
     # Partitions the features into start, mid and final sections segments of the run!
     X_train_lists = create_feature_portions(feature_mel, feature_ene_rul_order, percentages)
 
