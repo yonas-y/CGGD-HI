@@ -137,6 +137,62 @@ def calculate_trendability2(HI, time):
 
     return num / deno
 
+def calculate_consistency_metric(hi_runs):
+    """
+    Calculate the consistency metric for HI predictions from multiple runs with dynamic bin selection.
+
+    hi_runs: 2D numpy array of shape (time_steps, num_runs).
+
+    Returns:
+        consistency_metric: Average pairwise symmetrical uncertainty.
+    """
+
+    def calculate_entropy(data):
+        _, counts = np.unique(data, return_counts=True)
+        probabilities = counts / counts.sum()
+        return -np.sum(probabilities * np.log2(probabilities))
+
+    def calculate_mutual_information(X, Y):
+        """Calculate mutual information between two discrete datasets."""
+        joint_entropy = calculate_entropy(np.c_[X, Y])
+        MI = calculate_entropy(X) + calculate_entropy(Y) - joint_entropy
+        return max(MI, 0)  # Clamp to 0 to avoid negative MI due to numerical issues
+
+    def symmetrical_uncertainty(X, Y):
+        H_X = calculate_entropy(X)
+        H_Y = calculate_entropy(Y)
+        MI_XY = calculate_mutual_information(X, Y)
+        return 2 * MI_XY / (H_X + H_Y) if H_X + H_Y > 0 else 0
+
+    def calculate_bins(data_length):
+        """Determine the number of bins dynamically based on data length."""
+        if data_length < 1000:
+            return max(2, int(np.log2(data_length) + 1))  # Sturges' formula
+        return max(10, int(np.sqrt(data_length)))  # Square root choice
+
+    def discretize_data(data, n_bins):
+        """Discretize continuous data into bins using equal-width binning."""
+        est = KBinsDiscretizer(n_bins=n_bins, encode='ordinal', strategy='uniform', subsample=None)
+        return est.fit_transform(data)
+
+    num_runs = hi_runs.shape[1]
+    su_values = []
+
+    n_bins = calculate_bins(hi_runs.shape[0])
+    # Discretize each run's data
+    hi_discrete = discretize_data(hi_runs.T, n_bins=n_bins).T
+
+    # Calculate pairwise SU
+    for i in range(num_runs):
+        for j in range(i + 1, num_runs):
+            su = symmetrical_uncertainty(hi_discrete[:, i], hi_discrete[:, j])
+            su_values.append(su)
+
+    # # Compute average SU as consistency metric
+    consistency_metric_mean = np.mean(su_values)
+    consistency_metric_std = np.std(su_values)
+    return consistency_metric_mean, consistency_metric_std
+
 def lowess(x, y, tau=0.5):
     """
     Locally Weighted Smoothing (LOWESS).
