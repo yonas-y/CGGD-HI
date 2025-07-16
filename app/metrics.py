@@ -141,3 +141,37 @@ def calculate_trendability2(HI, time):
                    (len(ranks_time_scaled) * np.sum(np.square(ranks_time_scaled)) - np.square(np.sum(ranks_time_scaled))))
 
     return num / deno
+
+def lowess(x, y, tau=0.5):
+    """
+    Locally Weighted Smoothing (LOWESS).
+
+    Parameters:
+        x (array): Independent variable.
+        y (array): Dependent variable.
+        tau (float): The smoothing parameter, also called bandwidth or span.
+
+    Returns:
+        y_smoothed (array): Smoothed values of y.
+    """
+    n = len(x)
+    y_smoothed = np.zeros(n)
+    x = np.linspace(0, 1, len(x))
+
+    for i in range(n):
+        # Compute weights
+        weights = np.exp(-((x - x[i]) ** 2) / (2 * tau ** 2))
+
+        # Diagonal weight matrix
+        W = np.diag(weights)
+
+        # Design matrix
+        X = np.column_stack((np.ones(n), x))
+
+        # Compute parameter estimates
+        theta = np.linalg.inv(X.T @ W @ X) @ (X.T @ W @ y)
+
+        # Predict y value at x[i]
+        y_smoothed[i] = np.dot([1, x[i]], theta)
+
+    return y_smoothed
