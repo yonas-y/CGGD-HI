@@ -77,3 +77,17 @@ def calculate_monotonicity2(HI):
     mono_negative = (np.sum(first_der < 0) / (len(HI) - 1)) + (np.sum(second_der < 0) / (len(HI) - 2))
     monotonicity_percentage = mono_negative / (mono_positive + mono_negative)
     return monotonicity_percentage
+
+def calculate_robustness(HI, Smoothed_HI):
+    """
+    Calculate the percentage of robustness of health indicator scores.
+
+    Parameters:
+        HI (array): Array of health indicator scores.
+        Smoothed_HI (array): Array of Smoothed health indicator scores.
+
+    Returns:
+        robustness_percentage (float): Percentage of robustness.
+    """
+    return np.sum(np.exp(-(np.abs((HI - Smoothed_HI) / HI)))) / len(HI)
+
