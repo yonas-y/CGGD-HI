@@ -6,7 +6,7 @@ from steps.save_metrics_step import save_metrics_step
 
 @pipeline
 def training_pipeline(model, iter_n: int = 0):
-    # Get data from data_pipeline
+    # Get data from data_pipeline!
     training_data, validation_data, _ = data_pipeline()
 
     # Model execution step!
