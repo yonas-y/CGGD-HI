@@ -195,7 +195,7 @@ def model_execution(model,
 
         # The early stopping strategy: stop the training if the average of the bounds satisfaction increases.
         if save_weights:
-            con_SR = (
+            overall_loss = (
                     recon_rescale * train_mean_metrics['train_recon_loss_l'] +
                     softrank_rescale * train_mean_metrics['train_soft_rank_loss_l'] +
                     mono_rescale[1] * (1 - train_mean_metrics['train_mono_correlation_l']) +
@@ -204,7 +204,7 @@ def model_execution(model,
                     lower_rescale * (1 - train_mean_metrics['train_per_lower_bnd_sat_l'])
                       )
             best = best_l
-            best, wait = save_model_weights(con_SR, best, wait)
+            best_l, wait = save_model_weights(overall_loss, best, wait)
 
         # The early stopping strategy: stop the training no more performance improvement.
         if early_stopping:
