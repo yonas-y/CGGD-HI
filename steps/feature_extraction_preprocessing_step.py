@@ -60,9 +60,10 @@ def feature_preprocessing_step(dep: bool,
         raise ValueError("No features loaded; check your feature directory or config.")
 
     # Split and scale the features!
-    logger.info("Splitting and scaling features...")
     train_index_list = cfg.bearing_splits[bearing_used]["train_index"]
     test_index_list = cfg.bearing_splits[bearing_used]["test_index"]
+    logger.info(f"Splitting and scaling features. "
+                f"Train Indexes: {train_index_list}, Test Indexes: {test_index_list}...")
     X_train, X_test, X_train_scaled, X_test_scaled = feature_preprocess.split_scale_features(
         feature_db_list, train_index_list, test_index_list)
 
