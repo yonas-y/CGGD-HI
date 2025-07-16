@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import joblib
 from typing import List, Tuple, Dict
@@ -55,7 +56,10 @@ class feature_preprocessing:
     split_scale_features(): Splits the whole data into train and text and scales them.
     """
 
-    def __init__(self, feature_directory: Path, output_directory: Path, bearing_used: str, channel_used: str):
+    def __init__(self, feature_directory: Path,
+                 output_directory: Path,
+                 bearing_used: str,
+                 channel_used: str):
         """
         Initialize with the feature directory.
 
@@ -143,7 +147,8 @@ class feature_preprocessing:
         train_scaled_list = np.split(train_scaled, train_split_indices, axis=0)
         test_scaled_list = np.split(test_scaled, test_split_indices, axis=0)
 
-        self.output_dir.mkdir(exist_ok=True)
-        joblib.dump(self.scaler, self.output_dir / f"{self.bearing}_scaler.pkl")  # save the scaler!
+        scaler_dir = Path(self.output_dir) / "scaler"  # now scaler_dir is a Path
+        scaler_dir.mkdir(parents=True, exist_ok=True)  # safely create directory if needed
+        joblib.dump(self.scaler, scaler_dir / f"{self.bearing}_scaler.pkl")  # save the scaler!
 
         return train_features, test_features, train_scaled_list, test_scaled_list
