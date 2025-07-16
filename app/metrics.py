@@ -91,3 +91,53 @@ def calculate_robustness(HI, Smoothed_HI):
     """
     return np.sum(np.exp(-(np.abs((HI - Smoothed_HI) / HI)))) / len(HI)
 
+def calculate_trendability1(HI, time):
+    """
+    Calculate the percentage of trendability of health indicator scores.
+
+    Parameters:
+        HI (array): Array of health indicator scores.
+        time (array): Array of time.
+    Returns:
+        trendability_percentage (float): Percentage of trendability.
+    """
+    num = len(HI) * np.sum(HI * time) - np.sum(HI) * np.sum(time)
+    deno = np.sqrt((len(HI) * np.sum(np.square(HI)) - np.square(np.sum(HI))) * (
+                len(time) * np.sum(np.square(time)) - np.square(np.sum(time))))
+
+    return num / deno
+
+
+def calculate_trendability2(HI, time):
+    """
+    Calculate the percentage of trendability of health indicator scores.
+
+    Parameters:
+        HI (array): Array of health indicator scores.
+        time (array): Array of time.
+    Returns:
+        trendability_percentage (float): Percentage of trendability.
+    """
+    # Find the indices that would sort the array
+    sorted_indices_HI = np.argsort(HI)
+    sorted_indices_time = np.argsort(time)
+
+    # Initialize an array to store the ranks
+    ranks_HI = np.empty_like(sorted_indices_HI)
+    ranks_time = np.empty_like(sorted_indices_time)
+
+    # Assign ranks to the elements based on their indices
+    ranks_HI[sorted_indices_HI] = np.arange(len(HI))
+    ranks_time[sorted_indices_time] = np.arange(len(time))
+
+    # Manually scale array between 0 and 1 using NumPy
+    min_val_HI, min_val_time = np.min(ranks_HI), np.min(ranks_time)
+    max_val_HI, max_val_time = np.max(ranks_HI), np.max(ranks_time)
+    ranks_HI_scaled = (ranks_HI - min_val_HI) / (max_val_HI - min_val_HI)
+    ranks_time_scaled = (ranks_time - min_val_time) / (max_val_time - min_val_time)
+
+    num = len(ranks_HI_scaled) * np.sum(ranks_HI_scaled * ranks_time_scaled) - np.sum(ranks_HI_scaled) * np.sum(ranks_time_scaled)
+    deno = np.sqrt((len(ranks_HI_scaled) * np.sum(np.square(ranks_HI_scaled)) - np.square(np.sum(ranks_HI_scaled))) *
+                   (len(ranks_time_scaled) * np.sum(np.square(ranks_time_scaled)) - np.square(np.sum(ranks_time_scaled))))
+
+    return num / deno
