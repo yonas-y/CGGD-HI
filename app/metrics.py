@@ -1,10 +1,5 @@
-# from scipy import stats
-# import tensorflow as tf
 import numpy as np
-from fast_soft_sort.tf_ops import soft_rank, soft_sort
-from scipy.stats import spearmanr
-# from sklearn.metrics import mutual_info_score
-# from sklearn.preprocessing import KBinsDiscretizer
+from fast_soft_sort.tf_ops import soft_rank
 
 
 def custom_differentiable_spearman_corr_loss(y_pred,
