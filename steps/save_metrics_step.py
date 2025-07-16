@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 @step(enable_cache=False)
 def save_metrics_step(performance_df: pd.DataFrame, iteration_n: int):
-    output_dir = 'output/model_performance'
-    os.makedirs(output_dir, exist_ok=True)
+    model_per_dir = os.path.join(cfg.OUTPUT_DIR, "models_performance")
+    os.makedirs(model_per_dir, exist_ok=True)
     filename = f'performance_df_' \
                f'{cfg.model_hyperparams.encoding_n}_' \
                f'{cfg.SETUP_Name}_' \
@@ -23,5 +23,5 @@ def save_metrics_step(performance_df: pd.DataFrame, iteration_n: int):
                f'{cfg.constraint_params.lower_bound_rf}_' \
                f'{iteration_n}.pkl'
 
-    performance_df.to_pickle(os.path.join(output_dir, filename))
+    performance_df.to_pickle(os.path.join(model_per_dir, filename))
     logger.info(f"✅  Saved model performance as: {filename}")
