@@ -1,13 +1,16 @@
-from scipy import stats
-import tensorflow as tf
+# from scipy import stats
+# import tensorflow as tf
 import numpy as np
 from fast_soft_sort.tf_ops import soft_rank, soft_sort
 from scipy.stats import spearmanr
-from sklearn.metrics import mutual_info_score
-from sklearn.preprocessing import KBinsDiscretizer
+# from sklearn.metrics import mutual_info_score
+# from sklearn.preprocessing import KBinsDiscretizer
 
 
-def custom_differentiable_spearman_corr_loss(y_pred, y_true, regularization="l2", regularization_strength=1.0):
+def custom_differentiable_spearman_corr_loss(y_pred,
+                                             y_true,
+                                             regularization="l2",
+                                             regularization_strength=1.0):
     """
     Computes the Spearman's rank correlation coefficient using NumPy.
 
@@ -39,3 +42,38 @@ def custom_differentiable_spearman_corr_loss(y_pred, y_true, regularization="l2"
     spearman_loss = (1 + spearman_corr) / 2.0
 
     return spearman_loss
+
+def calculate_monotonicity1(HI):
+    """
+    Calculate the percentage of monotonousness of health indicator scores using
+    ==== The way calculated   =======
+
+    Parameters:
+        HI (array): Array of health indicator scores.
+
+    Returns:
+        monotonicity_percentage (float): Percentage of monotonousness.
+    """
+    # Calculate the first derivative
+    first_der = np.diff(HI)
+    monotonicity_percentage = (np.sum(first_der <= 0) - np.sum(first_der > 0)) / (len(HI) - 1)
+    return monotonicity_percentage
+
+def calculate_monotonicity2(HI):
+    """
+    Calculate the percentage of monotonousness of health indicator scores.
+    ==== The way calculated   =======
+
+    Parameters:
+        HI (array): Array of health indicator scores.
+
+    Returns:
+        monotonicity_percentage (float): Percentage of monotonousness.
+    """
+    # Calculate the first derivative
+    first_der = np.diff(HI)
+    second_der = np.diff(first_der)
+    mono_positive = (np.sum(first_der > 0) / (len(HI) - 1)) + (np.sum(second_der > 0) / (len(HI) - 2))
+    mono_negative = (np.sum(first_der < 0) / (len(HI) - 1)) + (np.sum(second_der < 0) / (len(HI) - 2))
+    monotonicity_percentage = mono_negative / (mono_positive + mono_negative)
+    return monotonicity_percentage
