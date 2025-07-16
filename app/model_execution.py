@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import time
+import os
 from typing import List
 import logging
 
@@ -19,7 +20,7 @@ def model_execution(model,
     :param model: the model architecture used.
     :param training_data: the input training data features!
     :param validation_data: the input validation data features!
-    :param iteration: the iteration number!
+    :param iteration: the number of iterations!
 
     :return:The performance of the model as a dataframe.
     """
@@ -28,8 +29,6 @@ def model_execution(model,
     patience = cfg.model_training_params.patience
     save_weights = cfg.model_training_params.save_weights
     early_stopping = cfg.model_training_params.early_stop
-
-    best1, best2, wait = float(-np.inf), float(np.inf), 0
 
     recon_rescale = cfg.constraint_params.reconstruction_rf
     softrank_rescale = cfg.constraint_params.soft_rank_rf
@@ -41,21 +40,24 @@ def model_execution(model,
     ene_max = cfg.constraint_params.max_scaled_energy
 
     # Helper function to save model weights
-    def save_model_weights(loss_value, best_val, wait_val, tra_approach):
-        improved = False
-        if tra_approach == 1 and loss_value > best_val:
-            improved = True
-        elif tra_approach == 2 and loss_value < best_val:
-            improved = True
+    def save_model_weights(loss_value, best_val, wait_val):
+        if loss_value < best_val:
+            # directory to save models
+            model_weight_dir = os.path.join(cfg.OUTPUT_DIR, "model_weights")
+            os.makedirs(model_weight_dir, exist_ok=True)
 
-        if improved:
-            filename = (
-                f'output/saved_models/Custom_Model_{cfg.model_hyperparams.encoding_n}_{cfg.SETUP_Name}_'
-                f'{cfg.bearing_used}_{recon_rescale}_{softrank_rescale}_{mono_rescale[1]}_{ene_dev_rescale}_'
-                f'{upper_rescale}_{lower_rescale}_{iteration}_recon_val.weights.h5'
+            # consistent filename
+            final_filename = os.path.join(
+                model_weight_dir,
+                f"Custom_Model_{cfg.model_hyperparams.encoding_n}_{cfg.SETUP_Name}_"
+                f"{cfg.bearing_used}_{recon_rescale}_{softrank_rescale}_{mono_rescale[1]}_{ene_dev_rescale}_"
+                f"{upper_rescale}_{lower_rescale}_{iteration}_recon_val.weights.h5"
             )
-            model.save_weights(filename)
-            logger.info(f"☁️ Saved the model weight!")
+
+            # Save weights to the temp file
+            model.save_weights(final_filename)
+            logger.info(f"☁️ Model weights saved to: {final_filename}")
+
             best_val = loss_value
             wait_val = 0
         else:
@@ -100,6 +102,7 @@ def model_execution(model,
 
     # Initialize an empty list for each metric
     epoch_lists = {name: [] for name in epoch_metrics}
+    best_l, wait = float(np.inf), 0
 
     for epoch in range(epochs):
         logger.info(f"⚙️ Model training and validation phase for epoch {epoch + 1}!")
@@ -192,21 +195,18 @@ def model_execution(model,
 
         # The early stopping strategy: stop the training if the average of the bounds satisfaction increases.
         if save_weights:
-            # Determine the current satisfaction ratio based on the training approach
-            if mono_rescale[1] != 0 or ene_dev_rescale != 0 or upper_rescale != 0 or lower_rescale != 0:
-                con_SR = (mono_rescale[1] * train_mean_metrics['train_mono_correlation_l'] +
-                          ene_dev_rescale * train_mean_metrics['train_ene_pred_deviation_l'] +
-                          upper_rescale * train_mean_metrics['train_per_upper_bnd_sat_l'] +
-                          lower_rescale * train_mean_metrics['train_per_lower_bnd_sat_l'])
-                best = best1
-                best1, wait = save_model_weights(con_SR, best, wait, 1)
-            else:
-                # con_SR = train_mean_metrics['train_recon_loss_l']
-                con_SR = ((recon_rescale * train_mean_metrics['train_recon_loss_l']) +
-                          (softrank_rescale * train_mean_metrics['train_soft_rank_loss_l']))
-                best = best2
-                best2, wait = save_model_weights(con_SR, best, wait, 2)
+            con_SR = (
+                    recon_rescale * train_mean_metrics['train_recon_loss_l'] +
+                    softrank_rescale * train_mean_metrics['train_soft_rank_loss_l'] +
+                    mono_rescale[1] * (1 - train_mean_metrics['train_mono_correlation_l']) +
+                    ene_dev_rescale * (1 - train_mean_metrics['train_ene_pred_deviation_l']) +
+                    upper_rescale * (1 - train_mean_metrics['train_per_upper_bnd_sat_l']) +
+                    lower_rescale * (1 - train_mean_metrics['train_per_lower_bnd_sat_l'])
+                      )
+            best = best_l
+            best, wait = save_model_weights(con_SR, best, wait)
 
+        # The early stopping strategy: stop the training no more performance improvement.
         if early_stopping:
             if wait >= patience:
                 logger.info("⚠️ Early Stopping! ⚠️ No more performance improvement!")
