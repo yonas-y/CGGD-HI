@@ -67,6 +67,11 @@ def feature_preprocessing_step(dep: bool,
     X_train, X_test, X_train_scaled, X_test_scaled = feature_preprocess.split_scale_features(
         feature_db_list, train_index_list, test_index_list)
 
+    # In case of conventional AE training take only the defined normal data (10 or 20% at the start)!
+    if cfg.model_type == "CAE":
+        X_train = [sub_feature[:max(1, int(len(sub_feature)*0.2))] for sub_feature in X_train]
+        X_train_scaled = [sub_feature[:max(1, int(len(sub_feature)*0.2))] for sub_feature in X_train_scaled]
+
     # Extract the scaled energy, RUL and order of the training samples!
     logger.info("Calculating the feature energy ...")
     Ene_RUL_order_train = features_ene_rul_train(X_train)
