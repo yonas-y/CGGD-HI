@@ -55,8 +55,8 @@ def create_feature_portions(train_mel_feature: List[np.ndarray],
 
 def shuffle_batched_interleaved(percentage_partitioned_data: List[List[np.ndarray]],
                                 batch_percentages: List[float],
-                                val_split: float = 0.2,
-                                batch_size: int = 16) -> Tuple[List[List[np.ndarray]], List[List[np.ndarray]]]:
+                                val_split: float = 0.1,
+                                batch_size: int = 64) -> Tuple[List[List[np.ndarray]], List[List[np.ndarray]]]:
     """
     A function that Shuffles and creates a training and validation sets bt taking data from the different segments pf the
     run by partitioning based on the batch percentage value. More data compared to its size is included from the
@@ -133,10 +133,10 @@ def shuffle_batched_interleaved(percentage_partitioned_data: List[List[np.ndarra
 
 
 def bound_indicators(y_data,
-                     max_up_bnd=1.0,
-                     upper_cutoff=0.9,
-                     min_lwr_bnd=0,
-                     lower_cutoff=0.1
+                     max_up_bnd: float = 1.0,
+                     upper_cutoff: float = 0.9,
+                     min_lwr_bnd: float = 0,
+                     lower_cutoff: float = 0.1
                      ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Compute bound indicators and bounding values for input RUL (Remaining Useful Life) data.
