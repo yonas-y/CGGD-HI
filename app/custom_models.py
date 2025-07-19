@@ -110,7 +110,7 @@ class CustomModel(CustomModelMain):
         """
         with (tf.GradientTape(persistent=True) as tape):
             predictions, encoding_out, AE_out = self.model(train_mel_feat, training=True)
-            recon_loss = tf.reduce_mean(tf.square(train_mel_feat - AE_out))
+            recon_loss = tf.cast(tf.reduce_mean(tf.square(train_mel_feat - AE_out)), dtype=tf.float32)
 
             # Get unique run identifiers!
             nu_of_run, _ = tf.unique(tf.reshape(run_train, [-1]))
@@ -136,7 +136,7 @@ class CustomModel(CustomModelMain):
                     soft_rank_loss_full.append(soft_rank_loss_inter)
 
                 # Aggregate soft rank results!
-                soft_rank_loss = tf.reduce_mean(soft_rank_loss_full)
+                soft_rank_loss = tf.cast(tf.reduce_mean(soft_rank_loss_full), dtype=tf.float32)
 
             # Calculate the total weighted loss as a sum of the two losses!
             total_init_loss = self.rs_factor_softrank * soft_rank_loss + self.rs_factor_recon * recon_loss
