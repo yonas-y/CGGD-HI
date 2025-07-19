@@ -1,6 +1,6 @@
 import numpy as np
 from fast_soft_sort.tf_ops import soft_rank
-
+from sklearn.preprocessing import KBinsDiscretizer
 
 def custom_differentiable_spearman_corr_loss(y_pred,
                                              y_true,
