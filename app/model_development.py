@@ -5,7 +5,7 @@ import random
 
 class ConvAE_model_subclass(tf.keras.Model):
     def __init__(self, input_shape=None,
-                 encoding_neurons=8,
+                 encoding_neurons=16,
                  reg=1e-3, dropout=0.0,
                  poolsize=2, kernelsize=3, stride=1,
                  activation=tf.keras.layers.ReLU(), **kwargs):
