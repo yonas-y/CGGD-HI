@@ -4,7 +4,8 @@ from app.metrics import (custom_differentiable_spearman_corr_loss,
                          calculate_monotonicity2,
                          calculate_robustness,
                          calculate_trendability1,
-                         calculate_trendability2)
+                         calculate_trendability2,
+                         lowess)
 
 
 def metric_satisfaction_ratio(predictions, tau: float = 0.025):
@@ -34,9 +35,9 @@ def metric_satisfaction_ratio(predictions, tau: float = 0.025):
 
     predictions = predictions.reshape(-1)
     time = np.linspace(0, len(predictions)*10, len(predictions))
-    smoothed_pred = Metr.lowess(time, predictions, tau=tau)
+    smoothed_pred = lowess(time, predictions, tau=tau)
 
-    spear_mono_correlation = custom_spearmans_rank_correlation(
+    spear_mono_correlation = custom_differentiable_spearman_corr_loss(
         np.reshape(smoothed_pred, [-1, 1]), np.reshape(time, [-1, 1]))
     monotonicity1 = calculate_monotonicity1(predictions)
     monotonicity2 = calculate_monotonicity2(predictions)
