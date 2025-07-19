@@ -51,12 +51,12 @@ def model_execution(model,
                 model_weight_dir,
                 f"Custom_Model_{cfg.model_hyperparams.encoding_n}_{cfg.SETUP_Name}_"
                 f"{cfg.bearing_used}_{recon_rescale}_{softrank_rescale}_{mono_rescale[1]}_{ene_dev_rescale}_"
-                f"{upper_rescale}_{lower_rescale}_{iteration}_recon_val.weights.h5"
+                f"{upper_rescale}_{lower_rescale}_{iteration}_recon_val.h5"
             )
 
             # Save weights to the temp file
-            model.save_weights(final_filename)
-            logger.info(f"☁️ Model weights saved to: {final_filename}")
+            model.save(final_filename)
+            logger.info(f"☁️ Model saved to: {final_filename}")
 
             best_val = loss_value
             wait_val = 0
@@ -197,7 +197,7 @@ def model_execution(model,
         if save_weights:
             overall_loss = (
                     recon_rescale * train_mean_metrics['train_recon_loss_l'] +
-                    softrank_rescale * train_mean_metrics['train_soft_rank_loss_l'] +
+                    0 * softrank_rescale * train_mean_metrics['train_soft_rank_loss_l'] +
                     mono_rescale[1] * (1 - train_mean_metrics['train_mono_correlation_l']) +
                     ene_dev_rescale * (1 - train_mean_metrics['train_ene_pred_deviation_l']) +
                     upper_rescale * (1 - train_mean_metrics['train_per_upper_bnd_sat_l']) +
