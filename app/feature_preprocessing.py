@@ -58,8 +58,8 @@ class feature_preprocessing:
 
     def __init__(self, feature_directory: Path,
                  output_directory: Path,
-                 bearing_used: str,
-                 channel_used: str):
+                 bearing_used: str = "bearing1",
+                 channel_used: str = "both"):
         """
         Initialize with the feature directory.
 
@@ -75,7 +75,8 @@ class feature_preprocessing:
         self.bearing = bearing_used
         self.channel = channel_used
 
-    def load_mel_features(self, n_mels) -> List[np.ndarray]:
+    def load_mel_features(self,
+                          n_mels: int = 128) -> List[np.ndarray]:
         """
         Loads the bearing features!
 
@@ -104,7 +105,10 @@ class feature_preprocessing:
         return mel_db_feat_list
 
 
-    def split_scale_features(self, bearing_feature_list: list, train_indexes: list, test_indexes: list) -> Tuple[
+    def split_scale_features(self,
+                             bearing_feature_list: list,
+                             train_indexes: list,
+                             test_indexes: list) -> Tuple[
         List[np.ndarray],   # "X_train"
         List[np.ndarray],   # "X_test"
         List[np.ndarray],   # "X_train_scaled"
