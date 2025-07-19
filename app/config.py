@@ -76,6 +76,7 @@ class DatasetConfig:
     """
     # Data and Features Directories!
     SETUP_Name: str
+    model_type: str
     OUTPUT_DIR: Path
     SETUP_RAW_DIRS: list  # list of Path objects to the different folders of each setup!
     PICKLE_DATA_DIR: Path
@@ -106,7 +107,7 @@ class DatasetConfig:
 def build_model_hyperparams(dataset_cfg: DatasetConfig) -> ModelHyperparameters:
     return ModelHyperparameters(
         input_sample_shape=(dataset_cfg.n_mels, dataset_cfg.n_channels),
-        encoding_n=8,
+        encoding_n=16,
         regularization=1e-3,
         dropout_rate=0.0,
         pooling_size=2,
@@ -124,10 +125,9 @@ def build_model_training_params() -> ModelTrainingParameters:
     return ModelTrainingParameters(
         run_partitioning_portion=(0.1, 0.85, 0.05),
         segment_percentages_in_batch=(0.2, 0.7, 0.1),
-
         batch_size=64,
-        validation_split=0.2,
-        epochs=100,
+        validation_split=0.1,
+        epochs=150,
         patience=15,
         training_iterations=10,
         save_weights=False,
@@ -161,16 +161,19 @@ def get_config(setup_name: str, Local: bool) -> DatasetConfig:
                 Path("../../Datasets/Bearings/Pronostia/Dataset/Full_Test_Set/")
             ]
             pickle_dir = Path("../../Datasets/Bearings/raw_pickles/pronostia/")
+            out_dir = Path("output/")
         else:
             raw_dirs = [
                 Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/2012-PRONOSTIA/Learning_set/"),
                 Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/2012-PRONOSTIA/Full_Test_Set/")
             ]
             pickle_dir = Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/yonas/Datasets/Bearings/raw_pickles/pronostia/")
+            out_dir = Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/yonas/CheckPoints/")
 
         cfg = DatasetConfig(
             SETUP_Name="pronostia",
-            OUTPUT_DIR=Path("output/pronostia"),
+            model_type="CCAE",
+            OUTPUT_DIR=out_dir,
             SETUP_RAW_DIRS=raw_dirs,
             PICKLE_DATA_DIR=pickle_dir,
             FEATURE_DIR=Path("data/features/pronostia_mel_features"),
@@ -200,6 +203,7 @@ def get_config(setup_name: str, Local: bool) -> DatasetConfig:
                 Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/40Hz10kN/")
             ]
             pickle_dir = Path("../../Datasets/Bearings/raw_pickles/XJTU_SY/")
+            out_dir = Path("output/XJTU_SY")
         else:
             raw_dirs = [
                 Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/XJTU-SY_Bearing_Datasets/Data/35Hz12kN/"),
@@ -207,10 +211,12 @@ def get_config(setup_name: str, Local: bool) -> DatasetConfig:
                 Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/XJTU-SY_Bearing_Datasets/Data/40Hz10kN/")
             ]
             pickle_dir = Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/yonas/Datasets/Bearings/raw_pickles/XJTU_SY/")
+            out_dir = Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/yonas/CheckPoints/")
 
         cfg = DatasetConfig(
             SETUP_Name="XJTU_SY",
-            OUTPUT_DIR=Path("output/XJTU_SY"),
+            model_type="CCAE",
+            OUTPUT_DIR=out_dir,
             SETUP_RAW_DIRS=raw_dirs,
             PICKLE_DATA_DIR=pickle_dir,
             FEATURE_DIR=Path("data/features/XJTU_SY_mel_features"),
@@ -222,9 +228,9 @@ def get_config(setup_name: str, Local: bool) -> DatasetConfig:
             bearing_used='Bearing1',
             channel='both',
             bearing_splits={
-                "Bearing1": {"train_index": [1, 3], "test_index": [0, 2, 4]},
-                "Bearing2": {"train_index": [0, 1], "test_index": [2, 3, 4]},
-                "Bearing3": {"train_index": [1, 2], "test_index": [0, 3, 4]}
+                "Bearing1": {"train_index": [1, 3, 4], "test_index": [0, 2]},
+                "Bearing2": {"train_index": [0, 1, 2], "test_index": [3, 4]},
+                "Bearing3": {"train_index": [1, 3, 4], "test_index": [0, 2]}
             },
             model_hyperparams=None,
             constraint_params=None,
@@ -242,12 +248,15 @@ def get_config(setup_name: str, Local: bool) -> DatasetConfig:
 
 # ========= Parameters update function ========= #
 def update_config(cfg: DatasetConfig,
+                  model_type: str = "CCAE",
                   bearing_used: Optional[str] = None,
                   channel: Optional[str] = None,
                   **extra_params):
     """
     Update selected fields of DatasetConfig dynamically.
     """
+    if cfg.model_type is not None:
+        cfg.model_type = model_type
     if bearing_used is not None:
         cfg.bearing_used = bearing_used
     if channel is not None:

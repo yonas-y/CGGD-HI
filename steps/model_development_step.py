@@ -25,7 +25,7 @@ def model_development_step() -> ConvAE_model_subclass:
     stride = cfg.model_hyperparams.stride_conv
     activation = cfg.model_hyperparams.activation_function
 
-    logger.info(f"🧰 Initializing the model and this it its architecture!")
+    logger.info(f"🧰 Initializing the model and this is its architecture!")
     model_instance = ConvAE_model_subclass(input_shape=input_sh,
                                            encoding_neurons=encod_n,
                                            reg=regularization, dropout=dropout_rate, poolsize=poolsize,
