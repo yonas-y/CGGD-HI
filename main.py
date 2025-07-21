@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # -----------------------------------------------
     # ✅ Step 2: Load the data, train and validate!
     # -----------------------------------------------
-    n_iters = cfg.model_training_params.training_iterations
-    for iter_n in range(n_iters):
+    iteration_range = cfg.model_training_params.training_iterations
+    for iter_n in range(iteration_range[0], iteration_range[1]):
         logger.info(f"🚀 Started model execution step {iter_n + 1} ...... ")
         training_pipeline(model=convAE_model_artifact, iter_n=iter_n)
