@@ -1,10 +1,6 @@
-import os
 import numpy as np
-import joblib
-from typing import List, Tuple, Dict
-from typing_extensions import Annotated
+from typing import List, Tuple
 from pathlib import Path
-from sklearn.preprocessing import StandardScaler
 from scipy.ndimage import uniform_filter1d
 import librosa
 
@@ -56,7 +52,8 @@ class feature_preprocessing:
     split_scale_features(): Splits the whole data into train and text and scales them.
     """
 
-    def __init__(self, feature_directory: Path,
+    def __init__(self,
+                 feature_directory: Path,
                  output_directory: Path,
                  bearing_used: str = "bearing1",
                  channel_used: str = "both"):
@@ -71,7 +68,6 @@ class feature_preprocessing:
         """
         self.feature_dir = feature_directory
         self.output_dir = output_directory
-        self.scaler = StandardScaler()
         self.bearing = bearing_used
         self.channel = channel_used
 
@@ -105,8 +101,8 @@ class feature_preprocessing:
         return mel_db_feat_list
 
 
-    def split_scale_features(self,
-                             bearing_feature_list: list,
+    @staticmethod
+    def split_scale_features(bearing_feature_list: list,
                              train_indexes: list,
                              test_indexes: list) -> Tuple[
         List[np.ndarray],   # "X_train"
@@ -125,34 +121,21 @@ class feature_preprocessing:
         train_features = [bearing_feature_list[i] for i in train_indexes]
         test_features = [bearing_feature_list[i] for i in test_indexes]
 
-        # Keep track of original lengths
-        train_lengths = [arr.shape[0] for arr in train_features]
-        test_lengths = [arr.shape[0] for arr in test_features]
+        training_data_conc = np.concatenate(train_features)
 
-        train_feat_conc = np.concatenate(train_features)
-        test_feat_conc = np.concatenate(test_features)
+        for feature_index in range(training_data_conc.shape[1]):
+            # Calculate mean and standard deviation for each feature across all inputs and channels
+            mean = np.mean(training_data_conc[:, feature_index, :], axis=0)
+            std = np.std(training_data_conc[:, feature_index, :], axis=0)
 
-        # Flatten first two dimensions
-        # Shape: (# of samples, mel bands, channel)
-        train_reshaped = train_feat_conc.reshape(-1, train_feat_conc.shape[2])
-        test_reshaped = test_feat_conc.reshape(-1, test_feat_conc.shape[2])
+            # Scale the feature using mean normalization!
+            train_scaled_list, test_scaled_list = [], []
+            for train_arr in train_features:
+                train_arr[:, feature_index, :] = (train_arr[:, feature_index, :] - mean) / (std + 1e-8)
+                train_scaled_list.append(train_arr)
 
-        train_features_scaled = self.scaler.fit_transform(train_reshaped)
-        test_features_scaled = self.scaler.transform(test_reshaped)
-
-        # Reshape back to original 3D shapes
-        train_scaled = train_features_scaled.reshape(train_feat_conc.shape)
-        test_scaled = test_features_scaled.reshape(test_feat_conc.shape)
-
-        # Split back to original list structure
-        train_split_indices = np.cumsum(train_lengths)[:-1]
-        test_split_indices = np.cumsum(test_lengths)[:-1]
-
-        train_scaled_list = np.split(train_scaled, train_split_indices, axis=0)
-        test_scaled_list = np.split(test_scaled, test_split_indices, axis=0)
-
-        scaler_dir = Path(self.output_dir) / "scaler"  # now scaler_dir is a Path
-        scaler_dir.mkdir(parents=True, exist_ok=True)  # safely create directory if needed
-        joblib.dump(self.scaler, scaler_dir / f"{self.bearing}_scaler.pkl")  # save the scaler!
+            for test_arr in test_features:
+                test_arr[:, feature_index, :] = (test_arr[:, feature_index, :] - mean) / (std + 1e-8)
+                test_scaled_list.append(test_arr)
 
         return train_features, test_features, train_scaled_list, test_scaled_list
