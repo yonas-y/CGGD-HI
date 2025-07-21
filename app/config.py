@@ -146,7 +146,7 @@ def build_constraint_params() -> ConstraintParameters:
         lower_bound_rf=0.0,
         max_cutoff=1.0,
         upper_cutoff=0.9,
-        lower_cutoff=0.1,
+        lower_cutoff=0.05,
         min_cutoff=0.0,
         spearmans_regularization=0.1,
         max_scaled_energy=1.0,
