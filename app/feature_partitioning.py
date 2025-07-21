@@ -1,5 +1,6 @@
 # import tensorflow as tf
 from typing import List, Tuple
+import tensorflow as tf
 import numpy as np
 import random
 import time
@@ -79,7 +80,7 @@ def shuffle_batched_interleaved(percentage_partitioned_data: List[List[np.ndarra
     n_batches = int(3 * np.ceil(total_nu_samples / batch_size))
     logger.info(f"📦 Created number of total batches (3 * np.ceil(total_nu_samples / batch_size)): {n_batches}")
 
-    for i in range(n_batches):
+    for _ in range(n_batches):
         random.seed(time.time())
         seed = random.randint(0, 1000)  # Adjust the seed range as needed!
         extracted_elements_to_batch_list = []
@@ -116,6 +117,7 @@ def shuffle_batched_interleaved(percentage_partitioned_data: List[List[np.ndarra
         for sel_full_batch_size_element in full_batch_size_element_list:
             np.random.seed(seed)  # Set the seed for shuffling
             full_batch_size_element_shuffled = np.random.permutation(sel_full_batch_size_element)
+            full_batch_size_element_shuffled = tf.cast(full_batch_size_element_shuffled, dtype=tf.float32)
             full_batch_size_element_shuffled_list.append(full_batch_size_element_shuffled)
 
         final_batched_datasets.append(full_batch_size_element_shuffled_list)
