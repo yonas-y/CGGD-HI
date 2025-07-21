@@ -51,7 +51,7 @@ def model_execution(model,
                 model_weight_dir,
                 f"Custom_Model_{cfg.model_hyperparams.encoding_n}_{cfg.SETUP_Name}_"
                 f"{cfg.bearing_used}_{recon_rescale}_{softrank_rescale}_{mono_rescale[1]}_{ene_dev_rescale}_"
-                f"{upper_rescale}_{lower_rescale}_{iteration}_recon_val.h5"
+                f"{upper_rescale}_{lower_rescale}_{iteration}_recon_val.keras"
             )
 
             # Save weights to the temp file
@@ -196,12 +196,12 @@ def model_execution(model,
         # The early stopping strategy: stop the training if the average of the bounds satisfaction increases.
         if save_weights:
             overall_loss = (
-                    recon_rescale * train_mean_metrics['train_recon_loss_l'] +
-                    0 * softrank_rescale * train_mean_metrics['train_soft_rank_loss_l'] +
-                    mono_rescale[1] * (1 - train_mean_metrics['train_mono_correlation_l']) +
-                    ene_dev_rescale * (1 - train_mean_metrics['train_ene_pred_deviation_l']) +
-                    upper_rescale * (1 - train_mean_metrics['train_per_upper_bnd_sat_l']) +
-                    lower_rescale * (1 - train_mean_metrics['train_per_lower_bnd_sat_l'])
+                    recon_rescale * val_mean_metrics['val_recon_loss_l'] +
+                    softrank_rescale * val_mean_metrics['val_soft_rank_loss_l'] +
+                    mono_rescale[1] * (1 - val_mean_metrics['val_mono_correlation_l']) +
+                    ene_dev_rescale * (1 - val_mean_metrics['val_ene_pred_deviation_l']) +
+                    upper_rescale * (1 - val_mean_metrics['val_per_upper_bnd_sat_l']) +
+                    lower_rescale * (1 - val_mean_metrics['val_per_lower_bnd_sat_l'])
                       )
             best = best_l
             best_l, wait = save_model_weights(overall_loss, best, wait)
@@ -214,13 +214,13 @@ def model_execution(model,
 
         logger.info(f"🔄 ETA: {round((time.time() - t) / 60, 2)} - epoch: {epoch + 1} "
               f"train_recon_loss: {train_mean_metrics['train_recon_loss_l']} "
-              f"train_soft_rank_loss: {train_mean_metrics['train_soft_rank_loss_l']} "
+              f"train_soft_rank_loss: {train_mean_metrics['train_soft_rank_loss_l']} \n"
               f"train_mono_correlation: {train_mean_metrics['train_mono_correlation_l']} "
               f"train_energy_pred_deviation: {train_mean_metrics['train_ene_pred_deviation_l']} "
               f"train_upper_bnd_sat: {train_mean_metrics['train_per_upper_bnd_sat_l']} "
-              f"train_lower_bnd_sat: {train_mean_metrics['train_per_lower_bnd_sat_l']} "
+              f"train_lower_bnd_sat: {train_mean_metrics['train_per_lower_bnd_sat_l']} \n"
               f"val_recon_loss: {val_mean_metrics['val_recon_loss_l']} "
-              f"val_soft_rank_loss: {val_mean_metrics['val_soft_rank_loss_l']} "
+              f"val_soft_rank_loss: {val_mean_metrics['val_soft_rank_loss_l']} \n"
               f"val_mono_correlation: {val_mean_metrics['val_mono_correlation_l']} "
               f"val_energy_pred_deviation: {val_mean_metrics['val_ene_pred_deviation_l']} "
               f"val_upper_bnd_sat: {val_mean_metrics['val_per_upper_bnd_sat_l']} "
