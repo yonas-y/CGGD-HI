@@ -1,39 +1,42 @@
 import numpy as np
 from fast_soft_sort.tf_ops import soft_rank
 from sklearn.preprocessing import KBinsDiscretizer
+import tensorflow as tf
 
 def custom_differentiable_spearman_corr_loss(y_pred,
                                              y_true,
                                              regularization="l2",
                                              regularization_strength=1.0):
-    """
-    Computes the Spearman's rank correlation coefficient using NumPy.
-
+    """Computes a differentiable Spearman's correlation coefficient.
     Args:
-        y_true (np.ndarray): Ground truth values, shape (N,) or (batch, N).
-        y_pred (np.ndarray): Predicted values, shape (N,) or (batch, N).
-        regularization:
-        regularization_strength:
-
+        y_true: A TensorFlow tensor of ground truth values.
+        y_pred: A TensorFlow tensor of predicted values.
+        regularization: Type of regularization used in the soft rank approach.
+        regularization_strength: The regularization strength.
     Returns:
-        np.ndarray: Spearman's rank correlation coefficient for each batch
+        A TensorFlow tensor of Spearman's correlation coefficients.
     """
 
-    # Reshape to (1, -1) so they become 2D
-    y_true = np.reshape(y_true, (1, -1))
-    y_pred = np.reshape(y_pred, (1, -1))
+    y_true = tf.reshape(y_true, [1, -1])
+    y_pred = tf.reshape(y_pred, [1, -1])
 
     # Compute the ranks of the sorted values.
     y_true_ranks = soft_rank(y_true, regularization=regularization, regularization_strength=regularization_strength)
     y_pred_ranks = soft_rank(y_pred, regularization=regularization, regularization_strength=regularization_strength)
 
-    # Compute squared rank differences
-    rank_diffs = y_true_ranks - y_pred_ranks
-    squared_rank_diffs = rank_diffs ** 2
+    # Compute the difference in ranks.
+    rank_diffs = tf.cast(y_true_ranks, tf.float32) - tf.cast(y_pred_ranks, tf.float32)
 
-    n = y_true.shape[1]
-    spearman_corr = 1 - 6 * np.sum(squared_rank_diffs, axis=1) / (n * (n ** 2 - 1))
+    # Compute the squared rank differences.
+    squared_rank_diffs = tf.cast(tf.square(rank_diffs), tf.float32)
 
+    # Compute the number of pairs.
+    n_pairs = tf.cast(tf.shape(y_true)[1], tf.float32)
+
+    # Compute the Spearman's correlation coefficient.
+    spearman_corr = 1 - 6 * tf.reduce_sum(squared_rank_diffs, axis=1) / (n_pairs * (n_pairs ** 2 - 1))
+
+    # Return the Spearman's loss value.
     spearman_loss = (1 + spearman_corr) / 2.0
 
     return spearman_loss
