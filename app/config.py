@@ -203,7 +203,7 @@ def get_config(setup_name: str, Local: bool) -> DatasetConfig:
                 Path("../../Datasets/Bearings/XJTU-SY_Bearing_Datasets/Data/40Hz10kN/")
             ]
             pickle_dir = Path("../../Datasets/Bearings/raw_pickles/XJTU_SY/")
-            out_dir = Path("output/XJTU_SY")
+            out_dir = Path("output/")
         else:
             raw_dirs = [
                 Path("/cw/dtaidata/dtaigeel/NoCsBack/dtai/XJTU-SY_Bearing_Datasets/Data/35Hz12kN/"),
@@ -222,15 +222,15 @@ def get_config(setup_name: str, Local: bool) -> DatasetConfig:
             FEATURE_DIR=Path("data/features/XJTU_SY_mel_features"),
             SampleRate=25600,
             frame_length=32768,
-            n_fft=1024,
-            hop_length=512,
+            n_fft=2048,
+            hop_length=1024,
             n_mels=128,
             bearing_used='Bearing1',
             channel='both',
             bearing_splits={
-                "Bearing1": {"train_index": [1, 3, 4], "test_index": [0, 2]},
-                "Bearing2": {"train_index": [0, 1, 2], "test_index": [3, 4]},
-                "Bearing3": {"train_index": [1, 3, 4], "test_index": [0, 2]}
+                "Bearing1": {"train_index": [1, 3], "test_index": [0, 2, 4]},
+                "Bearing2": {"train_index": [0, 4], "test_index": [1, 2, 3]},
+                "Bearing3": {"train_index": [1, 3], "test_index": [0, 2, 4]}
             },
             model_hyperparams=None,
             constraint_params=None,
