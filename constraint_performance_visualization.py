@@ -1,53 +1,57 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Data for each constraint-removed variant
-models = ['CCAE_EB', 'CCAE_MB', 'CCAE_ME']
+# Define metrics and models
 metrics = ['Trendability', 'Robustness', 'Consistency']
+models = ['CCAE_EB', 'CCAE_MB', 'CCAE_ME']
 
-# Average values extracted from your dataset
+# Reference performance (CCAE with all constraints)
+reference = [0.489, 0.927, 0.873]
+
+# Performance of each constraint-removed model
 data = {
-    'CCAE_EB': [-0.284, 0.902, 0.918],
-    'CCAE_MB': [-0.670, 0.922, 0.823],
-    'CCAE_ME': [-0.417, 0.956, 0.753]
+    'CCAE_EB': [0.284, 0.902, 0.918],
+    'CCAE_MB': [0.670, 0.922, 0.823],
+    'CCAE_ME': [0.417, 0.956, 0.753]
 }
 
-# Set up plot
-x = np.arange(len(metrics))  # positions for the metrics
-width = 0.2  # smaller bar width
+# Calculate deltas (Reference - Model Performance)
+deltas = {
+    model: [ref - val for ref, val in zip(reference, data[model])]
+    for model in models
+}
 
-# colors = ['#4B8BBE', '#306998']  # Cool palette
+# Plot settings
+x = np.arange(len(metrics))
+width = 0.2
+colors = ['#AEC6CF', '#B39EB5', '#4B8BBE']
 
-colors = ['#AEC6CF', '#B39EB5', '#4B8BBE']  # Pastel Blue, Orange, Lavender
+fig, ax = plt.subplots(figsize=(8.25, 6.25))
 
-fig, ax = plt.subplots(figsize=(7.5, 5.0))
+# Plot deltas
+for i, model in enumerate(models):
+    ax.bar(x + (i - 1) * width, deltas[model], width, label=model, color=colors[i])
 
-# Plot each bar group with tighter spacing and clear labels
-rects1 = ax.bar(x - width, data['CCAE_EB'], width, label='Monotonicity', color=colors[0])
-rects2 = ax.bar(x, data['CCAE_MB'], width, label='Energy-HI Consistency', color=colors[1])
-rects3 = ax.bar(x + width, data['CCAE_ME'], width, label='Bounds', color=colors[2])
-
-# Axis labels and ticks
-ax.set_ylabel('Mean Performance')
-ax.set_title('Impact of Constraints on CCAE Performance.')
+# Labels and formatting
+ax.set_ylabel('Δ Performance (CCAE - Semi-Constrained Model)')
+ax.axis(ymin=-0.21, ymax=0.23)
+ax.set_title('Impact of constraints on CCAE performance')
 ax.set_xticks(x)
 ax.set_xticklabels(metrics)
-ax.set_ylim([-1.0, 1.1])
-ax.legend(title='Missing Constraint')
+ax.axhline(0, color='black', linewidth=0.8, linestyle='--')
+ax.legend(title = 'Semi-Constrained Models')
 
-# Annotate bars with performance values
-def annotate_bars(rects):
-    for rect in rects:
-        height = rect.get_height()
-        ax.annotate(f'{height:.2f}',
-                    xy=(rect.get_x() + rect.get_width() / 2, height),
-                    xytext=(0, 5 if height >= 0 else -15),
-                    textcoords='offset points',
+# Annotate deltas
+def annotate_deltas(values, positions):
+    for i, val in enumerate(values):
+        ax.annotate(f'{val:.2f}', xy=(positions[i], val),
+                    xytext=(0, 5 if val >= 0 else -15), textcoords='offset points',
                     ha='center', va='bottom', fontsize=9)
 
-annotate_bars(rects1)
-annotate_bars(rects2)
-annotate_bars(rects3)
+# Apply annotation to each bar group
+for i, model in enumerate(models):
+    positions = x + (i - 1) * width
+    annotate_deltas(deltas[model], positions)
 
 plt.tight_layout()
 plt.show()
