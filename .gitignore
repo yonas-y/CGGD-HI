@@ -85,8 +85,8 @@ Test_Scripts.ipynb
 /output
 /data
 /saved_model_artifact
-execution_mains/
-active_configs/
+launchers/
+configs/
 
 
 app/fast-soft-sort-master/
