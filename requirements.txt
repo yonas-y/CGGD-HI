@@ -10,3 +10,4 @@ librosa
 PyWavelets
 fastparquet
 pyarrow
+matplotlib
