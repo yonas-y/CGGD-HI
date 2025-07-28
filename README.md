@@ -1,13 +1,10 @@
 # 🧩 Constraint Guided Gradient Descent for Health Indicator Learning (CGGD-HI)
 
-> Deep learning–based health indicator modeling using a **Constraint Guided Gradient Descent (CGGD)** framework and convolutional autoencoders (CAE).  
-> Learn meaningful, monotonic, and interpretable health indicators directly from raw data.
-
 ---
 
 ## 📌 Overview
 
-This project explores the use of **Constraint Guided Gradient Descent (CGGD)** for training deep learning models—specifically, convolutional autoencoders (CAE)—to estimate health indicators (HI) for rotating machinery (e.g., bearings).
+This project explores the use of **Constraint Guided Gradient Descent (CGGD)** for training deep learning models—specifically, convolutional autoencoders (CAE)—to estimate health indicators (HI) for bearings.
 
 ---
 
