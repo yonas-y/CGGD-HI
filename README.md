@@ -51,7 +51,7 @@ where θ_HI are the parameters of the HI model.
 ---
 
 ## 🧰 Tools & Frameworks
-- Python, PyTorch (or TensorFlow/Keras)
+- Python, TensorFlow/Keras (or PyTorch)
 - MLOps: [ZenML](https://zenml.io/), [MLflow](https://mlflow.org/)
 - Data processing: NumPy, SciPy
 - Visualization: Matplotlib, Seaborn
@@ -68,25 +68,15 @@ pip install -r requirements.txt
 
 ---
 
-## 🚀 Getting Started
-
-```python
-from model import CCAE
-
-# Initialize and train your constrained autoencoder
-model = CCAE()
-model.fit(train_data)
-```
-
-More examples will be available in the [examples](./examples) folder.
-
----
-
 ## 📜 Citation
 
 If you use this work, please cite:
-> "Constraint Guided Learning of a Deep Learning based Health Indicator Model"  
-> *Yonas Tefera*, et al.
+@article{phm2025cggdhi,
+title = {Constraint-Guided Learning of Data-driven Health Indicator Models: An Application on Bearings},
+author = {Yonas Tefera, Quinten Van Baelen, Maarten Meire, Stijn Luca and Peter Karsmakers},
+journal = {Vol. 16 No. 2 (2025): International Journal of Prognostics and Health Management },
+year = {2025},
+}
 
 ---
 
