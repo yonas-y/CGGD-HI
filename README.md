@@ -71,13 +71,14 @@ pip install -r requirements.txt
 ## 📜 Citation
 
 If you use this work, please cite:
+```bash
 @article{phm2025cggdhi,
 title = {Constraint-Guided Learning of Data-driven Health Indicator Models: An Application on Bearings},
 author = {Yonas Tefera, Quinten Van Baelen, Maarten Meire, Stijn Luca and Peter Karsmakers},
 journal = {Vol. 16 No. 2 (2025): International Journal of Prognostics and Health Management },
 year = {2025},
 }
-
+```
 ---
 
 ## 📬 Contact
