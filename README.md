@@ -15,23 +15,32 @@ The approach is validated on bearing degradation data and is directly applicable
 
 ---
 
-## 🚀 What This Repository Demonstrates
+## 🎯 Business & Industrial Relevance
 
-- Building **LLM-powered agents** with Google ADK  
-- Tool-augmented reasoning and action execution  
-- **Structured and schema-validated outputs**  
-- **Stateful and persistent agents**  
-- **Multi-agent coordination and delegation**  
-- Clean, modular, and extensible agent architectures  
+This project addresses common challenges in real-world asset monitoring systems:
+- ❌ Unstable or non-interpretable health indicators
+- ❌ Models that violate known degradation behavior
+- ❌ Heavy manual tuning of loss functions
+- ❌ Limited trust in black-box ML outputs
+
+**CGGD-HI enables:**
+- Trustworthy condition indicators for **maintenance planning**
+- Better integration of ML models into **industrial workflows**
+- Reduced reliance on ad-hoc regularization or heuristic losses
 
 ---
 
-## 🧩 Example Gallery
+## ⚙️ Core Methodology
 
-### 1️⃣ Basic Agent  
-📁 **Location:** `1-basic-agent/`
+### 📦 Baseline: Convolutional Autoencoder (CAE)
+A convolutional autoencoder learns a compact latent representation of time–frequency input data and reconstructs it with minimal error.
 
-A minimal agent illustrating core ADK setup and interaction.
+The Health Indicator (HI) is defined as:
+$$
+f^{\mathrm{CAE}}_{\mathrm{HI}}(X) = -\left\| X - D(E(X)) \right\|_2
+$$
+
+
 
 **Key concepts:**
 - Agent initialization
