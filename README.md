@@ -37,6 +37,7 @@ This project addresses common challenges in real-world asset monitoring systems:
 ---
 
 ## ⚙️ Core Methodology
+## ⚙️ Core Methodology
 
 ### 📦 Baseline: Convolutional Autoencoder (CAE)
 
@@ -133,11 +134,10 @@ Where:
 
 ---
 
-## 📦 Installation
+## 🛠️ Getting Started
 
+### 1️⃣ Install Dependencies
 ```bash
-git clone https://github.com/yourusername/cggd-hi.git
-cd cggd-hi
 pip install -r requirements.txt
 
 ---
@@ -152,11 +152,16 @@ pip install -r requirements.txt
 
 ---
 
-## 📜 Citation
+## 🎯 Why This Repository Matters (For Recruiters)
 
-If you use this work, please cite:
-> "Constraint Guided Learning of a Deep Learning based Health Indicator Model"  
-> *Yonas Tefera*, et al.
+This repository demonstrates the ability to:
+
+- Translate LLM capabilities into **reliable, structured systems**
+- Go beyond prompt engineering to include **tools, memory, and persistence**
+- Design **scalable agent architectures** aligned with real product needs
+- Apply modern AI frameworks in a **production-oriented manner**
+
+It reflects **practical engineering judgment**, not just experimentation.
 
 ---
 
