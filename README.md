@@ -158,6 +158,6 @@ If you use this work, please cite:
 
 ---  
 
-## 📬 Contact
-Questions, suggestions, or contributions?  
-Open an issue or contact: [yonas.yehualaeshet@gmail.com](mailto:yonas.yehualaeshet@gmail.com)
+## 📬 Contact & Collaboration
+📧 Email: [yonas.yehualaeshet@gmail.com](mailto:yonas.yehualaeshet@gmail.com)
+🐛 Issues: Open an issue in this repository
