@@ -37,7 +37,6 @@ This project addresses common challenges in real-world asset monitoring systems:
 ---
 
 ## ⚙️ Core Methodology
-## ⚙️ Core Methodology
 
 ### 📦 Baseline: Convolutional Autoencoder (CAE)
 
@@ -134,16 +133,7 @@ Where:
 
 ---
 
-## 🛠️ Getting Started
-
-### 1️⃣ Install Dependencies
-```bash
-pip install -r requirements.txt
-
----
-
 ## 📈 Typical Use Cases
-
 
 - Predictive maintenance systems
 - Health indicator generation for RUL estimation
@@ -151,21 +141,23 @@ pip install -r requirements.txt
 - Trustworthy ML models for industrial assets
 
 ---
+## 📜 Citation
 
-## 🎯 Why This Repository Matters (For Recruiters)
+If you use this work, please cite:
 
-This repository demonstrates the ability to:
+```bibtex
+@article{phm2025cggdhi,
+  title   = {Constraint-Guided Learning of Data-driven Health Indicator Models: An Application on Bearings},
+  author  = {Tefera, Yonas and Van Baelen, Quinten and Meire, Maarten and Luca, Stijn and Karsmakers, Peter},
+  journal = {International Journal of Prognostics and Health Management},
+  volume  = {16},
+  number  = {2},
+  year    = {2025}
+}
+```
 
-- Translate LLM capabilities into **reliable, structured systems**
-- Go beyond prompt engineering to include **tools, memory, and persistence**
-- Design **scalable agent architectures** aligned with real product needs
-- Apply modern AI frameworks in a **production-oriented manner**
+---  
 
-It reflects **practical engineering judgment**, not just experimentation.
-
----
-
-## 📬 Contact & Collaboration
-📧 Email: y[yonas.yehualaeshet@gmail.com](mailto:yonas.yehualaeshet@gmail.com)
-🐛 Issues: Open an issue in this repository
-
+## 📬 Contact
+Questions, suggestions, or contributions?  
+Open an issue or contact: [yonas.yehualaeshet@gmail.com](mailto:yonas.yehualaeshet@gmail.com)
