@@ -1,95 +1,169 @@
-# 🧩 Constraint Guided Gradient Descent Learning for Health Indicator Estimation (CGGD-HI)
+# 🧩 Constraint-Guided Deep Learning for Health Indicator Estimation (CGGD-HI)
+### Physically Consistent Health Indicators for Predictive Maintenance and Asset Health Monitoring
+
+## 📌 Project Overview
+This repository presents **Constraint-Guided Gradient Descent (CGGD)**, an industry-oriented deep learning approach for **robust health indicator (HI) estimation in bearing prognostics and health management (PHM)**.
+
+Traditional data-driven models often achieve high predictive accuracy but fail to enforce **physical plausibility**, while physics-based models struggle with incomplete or uncertain system knowledge.
+This work bridges that gap by **embedding domain constraints directly into the training process**, producing health indicators that are:
+- Physically meaningful
+- Monotonic and bounded
+- Robust across operating conditions
+- Suitable for downstream **Remaining Useful Life (RUL)** and maintenance decision systems
+
+The approach is validated on bearing degradation data and is directly applicable to **industrial predictive maintenance pipelines**.
 
 ---
 
-## 📌 Objective
+## 🚀 What This Repository Demonstrates
 
-This work presents a constraint-guided deep learning (\text{DL}) framework to develop physically consistent health indicators (\text{HIs}) in bearing prognostics and health management. Conventional data-driven approaches often lack physical plausibility, while physics-based models are limited by incomplete knowledge of complex systems. To address this, we integrate domain knowledge into \text{DL} models via constraints, ensuring monotonicity, bounding output ranges between 1 and 0 (representing healthy to failed states, respectively), and maintaining consistency between signal energy trends and \text{HI} estimates. Using constraints eliminates the need for complex loss term balancing to incorporate domain knowledge. The constraint-guided gradient descent algorithm (\text{CGGD}) is used to train a \text{DL} model that satisfies specific constraints.
-
-This project explores the use of **Constraint Guided Gradient Descent (CGGD)** for training deep learning models—specifically, convolutional autoencoders (CAE)—to estimate health indicators (HI) for bearings.
-
----
-
-## ⚙️ How It Works
-
-### 📦 Baseline: Convolutional Autoencoder (CAE)
-- Learn a **compact latent representation** (z) of input time–frequency data (X)
-- Reconstruct (X) from (z) with minimal loss
-- Health Indicator (HI) defined as the negative reconstruction error:
-
-    f^{CAE}_{HI}(X) = -||X - D(E(X))||_2
-
-Higher reconstruction errors (lower HI) typically correspond to faulty states.
+- Building **LLM-powered agents** with Google ADK  
+- Tool-augmented reasoning and action execution  
+- **Structured and schema-validated outputs**  
+- **Stateful and persistent agents**  
+- **Multi-agent coordination and delegation**  
+- Clean, modular, and extensible agent architectures  
 
 ---
 
-### 🧠 CGGD: Adding Constraints
-We reformulate the CAE training objective as a **constrained optimization problem**:
+## 🧩 Example Gallery
 
-    minimize   L_reconn(X, θ_E, θ_D)
-    subject to C_i(X, θ_E, θ_D) ≤ 0, for i=1,...,M
+### 1️⃣ Basic Agent  
+📁 **Location:** `1-basic-agent/`
 
-Constraints (C_i) capture domain knowledge (e.g., smoothness, monotonicity).  
-Custom **constraint directions** guide updates toward solutions satisfying these constraints.
+A minimal agent illustrating core ADK setup and interaction.
 
-
-\subsubsection{Monotonic Degradation Constraint}
-When a bearing is put into operation, it undergoes inevitable wear, which progressively worsens with time. This degradation should be reflected in the predicted \text{HI}, which is expected to decrease monotonically over time. To enforce this constraint, the \text{HI} estimates should be penalized if they deviate from the expected monotonic trend based on the time location of the corresponding input data samples.
-
-\subsubsection{Energy-\text{HI} Consistency Constraint}
-Building on the monotonic degradation constraint, we expect that while the \text{HI} values should decrease over time, the difference between the \text{HI} values of two consecutive samples should not vary significantly unless a substantial change in signal energy occurs. To enforce this concept, a constraint is introduced that ensures that if two samples have similar energy levels, their \text{HI} estimates should also be close in value. 
-
-\subsubsection{\text{HI} Boundary Constraint}
-When predicting the \text{HI} of a bearing, it is convenient that the values remain within a normalized range: a fully healthy state is represented by a value of $ub = 1$, while a failure state corresponds to a value of $lb = 0$. To enforce this condition, boundary constraints are enforced during the training process to ensure that all \text{HI} predictions fall within this defined range. 
+**Key concepts:**
+- Agent initialization
+- Prompt and instruction design
+- Model selection fundamentals
 
 ---
 
-At the core of the \text{CGGD} optimization procedure, the update of the model parameters is defined in Eq.~(\ref{eq:CGGDUsageSingleColumn}).
-\begin{figure*}[htbp]
-\hrule
-    \begin{align}
-        \label{eq:CGGDUsageSingleColumn}
-        \theta_{j+1} := \theta_j - \eta \left( \frac{\partial \mathcal{L}_{\text{reconn}}\left(X_t, \bm{\theta}_{\mathcal{E}}, \bm{\theta}_{\mathcal{D}} \right)}{\partial \theta_j} + \right. & \left. \max\left\{ \left\|\nabla_{\mathcal{E}} \mathcal{L}_{\text{reconn}} \left(X_t, \bm{\theta}_{\mathcal{E}}, \bm{\theta}_{\mathcal{D}} \right)\right\|,\epsilon\right\} \frac{\partial f^{\text{CCAE}}_{\text{HI}}\left(\mathcal{E}\left(X_t\right)\right)}{\partial \theta_j} \right. \\ \nonumber
-        & \Bigl[R_{\text{mono}} \operatorname{dir}_{\text{mono}} \left(X_t, \bm{X}, \bm{t}, \bm{\theta}_{\mathcal{E}}, \bm{\theta}_{\text{HI}}\right) F_{\text{MH}} \left(X_t,\operatorname{dir}_{\text{mono}}(X_t, \bm{X}, \bm{t}, \bm{\theta}_{\mathcal{E}}, \bm{\theta}_{\text{HI}})\right) \\ \nonumber 
-        & \quad + R_{\text{ene}} \operatorname{dir}_{\text{ene}} \left(X_t, X_{t_0}, \bm{\theta}_{\mathcal{E}}, \bm{\theta}_{\text{HI}}\right) F_{\text{MH}} \left(X_t,\operatorname{dir}_{\text{ene}}(X_t, X_{t_0}, \bm{\theta}_{\mathcal{E}}, \bm{\theta}_{\text{HI}})\right) \\ \nonumber 
-        & \quad + R_{\text{upper}} \operatorname{dir}_{\text{upper}} \left(X_t, \bm{\theta}_{\mathcal{E}}, \bm{\theta}_{\text{HI}}\right) F_{\text{MH}} \left(X_t,\operatorname{dir}_{\text{upper}}(X_t, \bm{\theta}_{\mathcal{E}}, \bm{\theta}_{\text{HI}})\right) \\ \nonumber 
-        & \quad + R_{\text{lower}} \operatorname{dir}_{\text{lower}} \left(X_t, \bm{\theta}_{\mathcal{E}}, \bm{\theta}_{\text{HI}}\right) F_{\text{MH}} \left(X_t,\operatorname{dir}_{\text{lower}}(X_t, \bm{\theta}_{\mathcal{E}}, \bm{\theta}_{\text{HI}})\right) \Bigr] \Bigr)
-    \end{align}
-\hrule
-\end{figure*}
+### 2️⃣ Tool-Enabled Agent  
+📁 **Location:** `2-tool-agent/`
 
+An agent capable of invoking external tools (functions or APIs) to augment its reasoning.
 
-## 🧰 Tools & Frameworks
-- Python, TensorFlow/Keras (or PyTorch)
-- MLOps: [ZenML](https://zenml.io/), [MLflow](https://mlflow.org/)
-- Data processing: NumPy, SciPy
-- Visualization: Matplotlib, Seaborn
+**Key concepts:**
+- Tool integration with `FunctionTool`
+- Agent–tool interfaces
+- Action-oriented agent design
 
 ---
 
-## 📦 Installation
+### 3️⃣ LiteLLM-Backed Agent  
+📁 **Location:** `3-litellm-agent/`
 
+An agent using **LiteLLM** to interface with alternative LLM providers.
+
+**Key concepts:**
+- Multi-provider LLM integration
+- Vendor-agnostic agent design
+- Cost- and flexibility-aware deployment
+
+---
+
+### 4️⃣ Structured Output Agent  
+📁 **Location:** `4-structured-outputs/`
+
+An agent that produces **schema-validated structured outputs** using Pydantic.
+
+**Key concepts:**
+- JSON output enforcement
+- Output validation
+- Reliable downstream system integration
+
+---
+
+### 5️⃣ Sessions & Stateful Interaction  
+📁 **Location:** `5-sessions-and-state/`
+
+An agent that maintains conversational state and user context across interactions.
+
+**Key concepts:**
+- Session services
+- Context persistence
+- Personalization foundations
+
+---
+
+### 6️⃣ Persistent Storage Agent  
+📁 **Location:** `6-persistent-storage/`
+
+A reminder agent backed by **SQLite-based persistent storage**.
+
+**Key concepts:**
+- Database-backed agent memory
+- CRUD operations
+- Durable state across restarts
+
+---
+
+### 7️⃣ Multi-Agent Manager  
+📁 **Location:** `7-multi-agent/`
+
+A manager agent coordinating multiple specialized sub-agents (e.g., news analysis, stock analysis, trend prediction).
+
+**Key concepts:**
+- Multi-agent orchestration
+- Task delegation
+- Compositional agent architectures
+
+---
+
+## 🛠️ Getting Started
+
+### 1️⃣ Install Dependencies
 ```bash
-git clone https://github.com/yourusername/cggd-hi.git
-cd cggd-hi
 pip install -r requirements.txt
 ```
 
----
+### 2️⃣ Configure Environment Variables
+Create a `.env` file (per example, if required) and add your API keys and configuration values.
 
-## 📜 Citation
-
-If you use this work, please cite:
+### 3️⃣ Run an Example
 ```bash
-@article{phm2025cggdhi,
-title = {Constraint-Guided Learning of Data-driven Health Indicator Models: An Application on Bearings},
-author = {Yonas Tefera, Quinten Van Baelen, Maarten Meire, Stijn Luca and Peter Karsmakers},
-journal = {Vol. 16 No. 2 (2025): International Journal of Prognostics and Health Management },
-year = {2025},
-}
+cd 6-persistent-storage/reminder_agent
+python main.py
 ```
+
 ---
 
-## 📬 Contact
-Questions, suggestions, or contributions?  
-Open an issue or contact: [yonas.yehualaeshet@gmail.com](mailto:yonas.yehualaeshet@gmail.com)
+## 🧪 Technology Stack
+
+- **Google Agent Development Kit (ADK)**
+- **Google Generative AI**
+- **LiteLLM**
+- **Pydantic**
+- **SQLite**
+- **Python**
+- `yfinance`, `psutil`, `python-dotenv`
+
+---
+
+## 🎯 Why This Repository Matters (For Recruiters)
+
+This repository demonstrates the ability to:
+
+- Translate LLM capabilities into **reliable, structured systems**
+- Go beyond prompt engineering to include **tools, memory, and persistence**
+- Design **scalable agent architectures** aligned with real product needs
+- Apply modern AI frameworks in a **production-oriented manner**
+
+It reflects **practical engineering judgment**, not just experimentation.
+
+---
+
+## ✅ Best Practices Followed
+
+- Modular and readable code structure
+- Clear separation of agent logic, tools, and storage
+- Environment-based configuration for secrets
+- Reusable patterns suitable for production adaptation
+
+---
+
+## 📄 License
+
+Licensed under the **Apache 2.0 License** — suitable for learning, experimentation, and extension.
